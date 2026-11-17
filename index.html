@@ -878,8 +878,6 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   var adminEl = document.getElementById("admin");
   var introStarted = false, introReady = false;
   var DONE_MS = 5000;
-  var ADMIN_USER = "admin", ADMIN_PASS = "verity2026";
-  var DATA_KEY = "verity-site-data-v1";
 
   function finishIntro() {
     if (intro.classList.contains("out")) return;
@@ -908,15 +906,22 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   });
 
   /* Data tersimpan */
-  var DATA_KEY2 = "verity-site-data-v2";
-  function loadData() {
+  function applyData(d) {
+    if (d && Array.isArray(d.divisions)) {
+      S.divisions = d.divisions.map(migrate);
+      S.history = d.history || [];
+      S.texts = d.texts || {};
+      S.hero = d.hero || "";
+    }
+  }
+  async function loadData() {
     try {
-      var d = JSON.parse(localStorage.getItem(DATA_KEY2) || "null");
-      if (d && Array.isArray(d.divisions)) { S.divisions = d.divisions.map(migrate); S.history = d.history || []; S.texts = d.texts || {}; S.hero = d.hero || ""; }
-    } catch (err) {}
+      var res = await fetch("/api/site-data", { credentials: "same-origin" });
+      if (res.ok) { var payload = await res.json(); applyData(payload.data); }
+    } catch (err) { console.warn("Data server belum dapat dimuat.", err); }
+    renderAll();
   }
   loadData();
-  renderAll();
 
   /* Login */
   var ltabs = document.querySelectorAll(".ltab");
@@ -933,30 +938,58 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     site.hidden = false;
     startIntro();
   });
-  document.getElementById("pAdmin").addEventListener("submit", function (ev) {
+  document.getElementById("pAdmin").addEventListener("submit", async function (ev) {
     ev.preventDefault();
     var u = document.getElementById("lUser").value.trim();
     var pw = document.getElementById("lPass").value;
-    if (u === ADMIN_USER && pw === ADMIN_PASS) {
+    var errEl = document.getElementById("lErr");
+    errEl.textContent = "Memeriksa login...";
+    try {
+      var res = await fetch("/api/login", {
+        method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: u, password: pw })
+      });
+      var result = await res.json();
+      if (!res.ok || !result.ok) throw new Error(result.error || "Username atau password salah.");
       loginEl.style.display = "none";
       document.body.classList.remove("intro-on");
       adminEl.hidden = false;
       renderAdmin();
-    } else {
-      document.getElementById("lErr").textContent = "Username atau password salah.";
-    }
+      errEl.textContent = "";
+    } catch (err) { errEl.textContent = err.message || "Login gagal. Periksa koneksi."; }
   });
-  document.getElementById("logoutSite").addEventListener("click", function () { location.reload(); });
-  document.getElementById("logoutAdmin").addEventListener("click", function () { location.reload(); });
+  async function logout() {
+    try { await fetch("/api/logout", { method: "POST", credentials: "same-origin" }); } catch (err) {}
+    location.reload();
+  }
+  document.getElementById("logoutSite").addEventListener("click", logout);
+  document.getElementById("logoutAdmin").addEventListener("click", logout);
 
   /* Admin */
   var aBody = document.getElementById("aBody"), aMsg = document.getElementById("aMsg"), aTab = "div", aSel = 0, aReg = 0, aTm = 0;
   function adminMsg(t) { aMsg.textContent = t; }
+  var saveTimer = null, saveVersion = 0;
   function persist() {
     S.divisions.forEach(function (d) { d.regions.forEach(function (g) { g.teams.forEach(function (t) { t.roster.forEach(function (p, i) { p[0] = String(i + 1).padStart(2, "0"); }); }); }); });
-    try { localStorage.setItem(DATA_KEY2, JSON.stringify(S)); adminMsg("Perubahan tersimpan."); }
-    catch (err) { adminMsg("Gagal menyimpan (foto terlalu besar atau penyimpanan penuh). Perubahan hanya berlaku selama halaman ini dibuka."); }
     renderAll();
+    adminMsg("Menyimpan perubahan...");
+    var version = ++saveVersion;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async function () {
+      try {
+        var res = await fetch("/api/site-data", {
+          method: "PUT", credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(S)
+        });
+        var result = await res.json();
+        if (!res.ok) throw new Error(result.error || "Gagal menyimpan data.");
+        if (version === saveVersion) adminMsg("Perubahan tersimpan ke database.");
+      } catch (err) {
+        if (version === saveVersion) adminMsg(err.message || "Gagal menyimpan. Periksa koneksi dan sesi admin.");
+      }
+    }, 650);
   }
   function setPath(path, v) {
     var k = path.split("."), o = S;
