@@ -60,7 +60,7 @@ export function isAdmin(req) {
   if (!secret || !username) return false;
 
   const cookieHeader = req.headers.cookie || "";
-  const match = cookieHeader.match(/(?:^|;\\s*)verity_session=([^;]+)/);
+  const match = cookieHeader.match(/(?:^|;\s*)verity_session=([^;]+)/);
   if (!match) return false;
 
   try {
