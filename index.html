@@ -973,7 +973,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   function persist() {
     S.divisions.forEach(function (d) { d.regions.forEach(function (g) { g.teams.forEach(function (t) { t.roster.forEach(function (p, i) { p[0] = String(i + 1).padStart(2, "0"); }); }); }); });
     renderAll();
-    adminMsg("Menyimpan perubahan...");
+    adminMsg("Sedang menyimpan...");
     var version = ++saveVersion;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(async function () {
@@ -985,7 +985,11 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
         });
         var result = await res.json();
         if (!res.ok) throw new Error(result.error || "Gagal menyimpan data.");
-        if (version === saveVersion) adminMsg("Perubahan tersimpan ke database.");
+        if (version === saveVersion) {
+          adminMsg(result.cleanupWarning
+            ? "Berhasil tersimpan, tetapi foto lama belum berhasil dihapus."
+            : "Berhasil tersimpan!");
+        }
       } catch (err) {
         if (version === saveVersion) adminMsg(err.message || "Gagal menyimpan. Periksa koneksi dan sesi admin.");
       }
@@ -1074,8 +1078,10 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     var p = e.target.getAttribute("data-img"), f = e.target.files && e.target.files[0];
     if (!p || !f) return;
     var rd = new FileReader();
+    rd.onerror = function () { adminMsg("Gagal membaca foto."); };
     rd.onload = function () {
       var im = new Image();
+      im.onerror = function () { adminMsg("File foto tidak dapat dibuka."); };
       im.onload = function () {
         var m = 900, r = Math.min(1, m / Math.max(im.width, im.height)), c = document.createElement("canvas");
         c.width = Math.round(im.width * r); c.height = Math.round(im.height * r);
@@ -1083,7 +1089,29 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
         var out;
         if (/png|webp|gif|svg/.test(f.type)) { out = c.toDataURL("image/webp", 0.88); if (out.indexOf("data:image/webp") !== 0) out = c.toDataURL("image/png"); }
         else out = c.toDataURL("image/jpeg", 0.82);
-        setPath(p, out); persist(); renderAdmin();
+
+        (async function () {
+          try {
+            adminMsg("Sedang mengunggah foto...");
+            var imageBlob = await (await fetch(out)).blob();
+            if (imageBlob.size > 4 * 1024 * 1024) throw new Error("Ukuran foto setelah diproses melebihi 4 MB.");
+            var uploadRes = await fetch("/api/upload-image", {
+              method: "POST", credentials: "same-origin",
+              headers: { "Content-Type": imageBlob.type },
+              body: imageBlob
+            });
+            var uploadResult = await uploadRes.json();
+            if (!uploadRes.ok || !uploadResult.url) {
+              throw new Error(uploadResult.error || "Foto gagal diunggah.");
+            }
+            setPath(p, uploadResult.url);
+            persist();
+            renderAdmin();
+          } catch (err) {
+            adminMsg("Gagal mengunggah foto: " + (err.message || "Periksa koneksi dan sesi admin."));
+            e.target.value = "";
+          }
+        })();
       };
       im.src = rd.result;
     };

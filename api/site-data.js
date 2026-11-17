@@ -1,4 +1,21 @@
+import { del } from "@vercel/blob";
 import { getDb, isAdmin, checkOrigin, readBody, sendJson } from "./_shared.js";
+
+function collectBlobUrls(value, urls = new Set()) {
+  if (typeof value === "string") {
+    try {
+      const parsed = new URL(value);
+      if (parsed.protocol === "https:" && parsed.hostname.endsWith(".blob.vercel-storage.com")) {
+        urls.add(value);
+      }
+    } catch {}
+  } else if (Array.isArray(value)) {
+    value.forEach(item => collectBlobUrls(item, urls));
+  } else if (value && typeof value === "object") {
+    Object.values(value).forEach(item => collectBlobUrls(item, urls));
+  }
+  return urls;
+}
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
@@ -25,11 +42,28 @@ export default async function handler(req, res) {
       }
 
       const sql = getDb();
+      const previousRows = await sql`SELECT data FROM verity_site_state WHERE id = 1`;
+      const previousData = previousRows[0]?.data ?? null;
+
       await sql`INSERT INTO verity_site_state (id, data, updated_at)
         VALUES (1, ${JSON.stringify(data)}::jsonb, NOW())
         ON CONFLICT (id) DO UPDATE
         SET data = EXCLUDED.data, updated_at = NOW()`;
-      return sendJson(res, 200, { ok: true });
+
+      const previousUrls = collectBlobUrls(previousData);
+      const currentUrls = collectBlobUrls(data);
+      const unusedUrls = [...previousUrls].filter(url => !currentUrls.has(url));
+      let cleanupWarning = false;
+
+      if (unusedUrls.length) {
+        try {
+          await del(unusedUrls);
+        } catch {
+          cleanupWarning = true;
+        }
+      }
+
+      return sendJson(res, 200, { ok: true, cleanupWarning });
     } catch {
       return sendJson(res, 500, { error: "Gagal menyimpan data ke database." });
     }
