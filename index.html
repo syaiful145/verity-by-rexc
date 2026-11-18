@@ -115,11 +115,10 @@ button{font:inherit;color:inherit}
 .dinner{overflow:hidden;min-height:0}
 .dpad{padding:.4rem 1.6rem 2rem;opacity:0;transform:translateY(-22px);transition:opacity .45s ease .1s,transform .6s cubic-bezier(.2,.7,.2,1)}
 .dit.open .dpad{opacity:1;transform:none}
-.pgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin-top:1rem}
-.pgrid .pc{flex:0 0 calc((100% - 1rem) / 2);min-width:0}
-@media (min-width:600px){.pgrid .pc{flex-basis:calc((100% - 2rem) / 3)}}
-@media (min-width:900px){.pgrid .pc{flex-basis:calc((100% - 3rem) / 4)}}
-@media (max-width:600px){.pgrid{gap:.7rem}.pgrid .pc{flex-basis:calc((100% - .7rem) / 2)}.pinfo{padding:.2rem .5rem .8rem}.pinfo h5{font-size:1.05rem;overflow-wrap:anywhere}.pinfo .pn{font-size:.75rem}.pinfo .pr{font-size:.62rem;letter-spacing:.08em}}
+.pgrid{display:grid;grid-template-columns:repeat(var(--roster-columns,2),minmax(0,1fr));justify-content:center;gap:1rem;margin-top:1rem;align-items:stretch}
+.pgrid .pc{min-width:0;width:100%}
+@media (min-width:600px) and (max-width:899px){.pgrid{grid-template-columns:repeat(var(--roster-columns-tablet,2),minmax(0,1fr))}}
+@media (max-width:599px){.pgrid{grid-template-columns:repeat(var(--roster-columns-mobile,2),minmax(0,1fr));gap:.7rem}.pinfo{padding:.2rem .5rem .8rem}.pinfo h5{font-size:1.05rem;overflow-wrap:anywhere}.pinfo .pn{font-size:.75rem}.pinfo .pr{font-size:.62rem;letter-spacing:.08em}}
 .pc{background:var(--ink-3);border:1px solid var(--line);overflow:hidden}
 
 .pimg{position:relative;aspect-ratio:4/5;background:radial-gradient(ellipse at 50% 18%,rgba(255,196,0,.22),transparent 62%),linear-gradient(#1d1d23,#101013);overflow:hidden}
@@ -977,7 +976,11 @@ html body img.country-flag{
   function regionsHtml(d) {
     var roster = d.regions.reduce(function (all, rg) { return all.concat(rg.roster || []); }, []);
     var totalPersonnel = roster.length + (Array.isArray(d.staff) ? d.staff.length : 0);
-    return '<section class="reg roster-section"><div class="roster-heading"><div class="rgh"><h4>Roster</h4></div><span class="roster-count">' + totalPersonnel + ' personel</span></div><div class="pgrid">' + roster.map(playerCard).join("") + '</div></section>';
+    var rosterRows = Math.max(1, Math.ceil(roster.length / 5));
+    var rosterColumns = Math.max(2, Math.min(5, Math.ceil(roster.length / rosterRows)));
+    var rosterColumnsTablet = Math.min(3, rosterColumns);
+    var rosterColumnsMobile = Math.min(2, rosterColumns);
+    return '<section class="reg roster-section"><div class="roster-heading"><div class="rgh"><h4>Roster</h4></div><span class="roster-count">' + totalPersonnel + ' personel</span></div><div class="pgrid" style="--roster-columns:' + rosterColumns + ';--roster-columns-tablet:' + rosterColumnsTablet + ';--roster-columns-mobile:' + rosterColumnsMobile + '">' + roster.map(playerCard).join("") + '</div></section>';
   }
   function staffHtml(d, divisionIndex) {
     if (!d.staff || !d.staff.length) return "";
