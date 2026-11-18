@@ -419,7 +419,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 .staff-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,.55fr) auto;gap:1rem;align-items:center;text-align:left;background:var(--ink-3);border:1px solid var(--line);padding:.9rem 1rem;color:var(--bone);cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
 .staff-row:hover{background:var(--ink-2);border-color:var(--gold);transform:translateY(-2px)}
 .staff-name{font-family:var(--hud);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
-.staff-role{color:var(--mute);font-size:.9rem}
+.staff-role{color:var(--mute);font-size:.9rem;text-align:center}
 .staff-more{color:var(--gold);font-family:var(--hud);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
 .staff-detail-slot{display:flex;justify-content:center;overflow:hidden;max-height:0;opacity:0;transform:translateY(-18px);transition:max-height .55s ease,opacity .35s ease,transform .55s cubic-bezier(.2,.8,.2,1);margin:0}
 .staff-detail-slot.open{max-height:1000px;opacity:1;transform:translateY(0);margin:.9rem 0 1.2rem}
@@ -429,13 +429,13 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 .staff-detail-photo svg{position:absolute;inset:0;width:100%;height:100%}
 .staff-detail-photo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:38%;background:linear-gradient(transparent,var(--ink-3))}
 .staff-detail-copy{padding:.2rem .9rem 1rem;text-align:center;position:relative;z-index:2;margin-top:-1.1rem}
-.staff-detail-copy h3{margin:0;font-family:var(--hud);font-size:1.25rem;text-transform:uppercase;letter-spacing:.04em}
+.staff-detail-copy h5{margin:0;font-family:var(--hud);font-size:1.25rem;text-transform:uppercase;letter-spacing:.04em;text-align:center}
+.staff-detail-copy .pn{text-align:center;width:100%}
 .staff-detail-role{display:block;color:var(--mute);font-size:.82rem;margin:.2rem 0}
 .staff-detail-text{color:var(--mute);margin:.4rem 0 0}
-.staff-detail-close{margin:.7rem auto 0;display:block;background:none;border:1px solid var(--line);color:var(--mute);padding:.35rem .8rem;cursor:pointer}
 @media (min-width:600px){.staff-detail-card{flex-basis:calc((100% - 2rem)/3)}}
 @media (min-width:900px){.staff-detail-card{flex-basis:calc((100% - 3rem)/4)}}
-@media (max-width:600px){.staff-detail-card{flex-basis:calc((100% - .7rem)/2)}.staff-detail-copy{padding:.2rem .5rem .8rem}.staff-detail-copy h3{font-size:1.05rem}.staff-detail-role{font-size:.75rem}}
+@media (max-width:600px){.staff-detail-card{flex-basis:calc((100% - .7rem)/2)}.staff-detail-copy{padding:.2rem .5rem .8rem}.staff-detail-copy h5{font-size:1.05rem}.staff-detail-role{font-size:.75rem}}
 .player-region{display:block;color:var(--mute);font-size:.76rem;margin-top:.18rem}
   .country-flag{display:inline-block;width:auto;height:.9em;max-width:1.7em;object-fit:fill;vertical-align:-.08em;border:0;border-radius:0;box-shadow:none;background:transparent}
 @media(max-width:600px){.staff-row{grid-template-columns:1fr auto;gap:.3rem .7rem}.staff-role{grid-column:1}.staff-more{grid-column:2;grid-row:1/3}}
@@ -731,13 +731,12 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     if (existing) existing.remove();
     var slot = document.createElement("div");
     slot.className = "staff-detail-slot";
-    slot.innerHTML = '<article class="pc staff-detail-card"><div class="pimg staff-detail-photo">' + (p.img ? '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '">' : SIL) + '</div><div class="pinfo staff-detail-copy"><h5>' + esc(p.name || "") + '</h5>' + (p.role ? '<span class="pn">' + esc(p.role) + '</span>' : '') + (p.detail ? '<p class="staff-detail-text">' + esc(p.detail) + '</p>' : '') + '<button class="staff-detail-close" type="button">Tutup detail</button></div></article>';
+    slot.innerHTML = '<article class="pc staff-detail-card"><div class="pimg staff-detail-photo">' + (p.img ? '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '">' : SIL) + '</div><div class="pinfo staff-detail-copy"><h5>' + esc(p.name || "") + '</h5>' + (p.role ? '<span class="pn">' + esc(p.role) + '</span>' : '') + (p.detail ? '<p class="staff-detail-text">' + esc(p.detail) + '</p>' : '') + '</div></article>';
     staffButton.insertAdjacentElement("afterend", slot);
     requestAnimationFrame(function () {
       slot.classList.add("open");
       setTimeout(function () { slot.scrollIntoView({ behavior:"smooth", block:"center" }); }, 120);
     });
-    slot.querySelector(".staff-detail-close").addEventListener("click", closeStaffDetail);
   }
   function closeStaffDetail() {
     var slot = document.querySelector(".staff-detail-slot");
