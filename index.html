@@ -679,6 +679,17 @@ html body img.country-flag{
   background:transparent !important;
 }
 </style>
+<style id="verity-division-scroll-smooth">
+/* Perhalus buka/tutup divisi dan kurangi repaint saat pengguna menggulir roster */
+.dbody{transition:grid-template-rows .42s cubic-bezier(.22,.61,.36,1)}
+.dpad{transform:translate3d(0,-10px,0);transition:opacity .26s ease .04s,transform .42s cubic-bezier(.22,.61,.36,1)}
+.dit.open .dpad{transform:translate3d(0,0,0)}
+/* Grid dekoratif tetap terlihat, tetapi tidak terus-menerus memicu repaint */
+.division-logo::before{animation:none}
+@media(prefers-reduced-motion:reduce){
+ .dbody,.dpad{transition:none!important}
+}
+</style>
 </head>
 <body class="intro-on">
 
