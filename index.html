@@ -471,6 +471,20 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 .atab,.btn,.abtn,.quick a,.news article,.pillars > div,.info > div,.pc,.dhead{transition:transform .22s ease,background-color .22s ease,border-color .22s ease,box-shadow .22s ease}
 .atab:hover,.btn:hover,.abtn:hover,.quick a:hover,.news article:hover,.pillars > div:hover,.info > div:hover,.pc:hover{transform:translateY(-2px)}
 @media (prefers-reduced-motion:reduce){.view.on,.view.on *,#aBody *,#atabs *, .atab,.btn,.abtn,.quick a,.news article,.pillars > div,.info > div,.pc,.dhead{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Skala tipografi informasi pemain dan manajemen dibuat konsisten */
+.pinfo .pn,
+.pinfo .pr,
+.pinfo .player-region,
+.staff-role,
+.staff-detail-role{font-size:.88rem;line-height:1.45;letter-spacing:normal;text-transform:none}
+@media(max-width:600px){
+  .pinfo .pn,
+  .pinfo .pr,
+  .pinfo .player-region,
+  .staff-role,
+  .staff-detail-role{font-size:.82rem;line-height:1.4;letter-spacing:normal}
+}
 </style>
 </head>
 <body class="intro-on">
