@@ -568,22 +568,22 @@ td.handle{font-size:1.1rem}
 .division-facts dt{margin:0 0 .2rem;color:var(--mute);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase}
 .division-facts dd{display:flex;align-items:center;gap:.4rem;margin:0;color:var(--bone);font-family:var(--hud);font-size:.95rem;font-weight:800}
 .division-logo{display:flex;align-items:center;justify-content:center;min-width:0;min-height:155px}
-/* Grid animasi Verity seperti latar intro dan beranda, khusus area logo divisi */
+/* Grid divisi dibuat menyebar lembut, memudar saat mendekati logo agar tidak membentuk kotak */
 .division-logo{position:relative;isolation:isolate;overflow:hidden}
 .division-logo::before{
  content:"";position:absolute;z-index:-1;inset:-35%;
  background-image:
-  linear-gradient(rgba(255,196,0,.13) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(255,196,0,.13) 1px,transparent 1px);
- background-size:28px 28px;
- -webkit-mask-image:radial-gradient(ellipse at center,#000 18%,transparent 76%);
- mask-image:radial-gradient(ellipse at center,#000 18%,transparent 76%);
- opacity:.72;animation:divisionGridDrift 18s linear infinite;
+  linear-gradient(rgba(255,196,0,.09) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,196,0,.09) 1px,transparent 1px);
+ background-size:32px 32px;
+ -webkit-mask-image:radial-gradient(ellipse at center,transparent 0%,rgba(0,0,0,.08) 27%,rgba(0,0,0,.48) 53%,#000 82%,transparent 100%);
+ mask-image:radial-gradient(ellipse at center,transparent 0%,rgba(0,0,0,.08) 27%,rgba(0,0,0,.48) 53%,#000 82%,transparent 100%);
+ opacity:.48;animation:divisionGridDrift 24s linear infinite;
  pointer-events:none
 }
 .division-logo::after{
  content:"";position:absolute;z-index:-1;inset:0;
- background:radial-gradient(ellipse at center,rgba(255,196,0,.13),transparent 68%);
+ background:radial-gradient(ellipse at center,rgba(255,196,0,.055),transparent 72%);
  pointer-events:none
 }
 .division-logo img,.division-logo-mark{position:relative;z-index:1}
