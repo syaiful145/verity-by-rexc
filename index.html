@@ -383,28 +383,6 @@ input:focus,select:focus{outline:none;border-color:var(--gold)}
 .abtn{background:none;border:1px solid var(--line);color:var(--mute);padding:.3rem .6rem;cursor:pointer;font:inherit;font-size:.8rem}
 .abtn:hover{color:var(--gold);border-color:var(--gold)}
 .amsg{color:var(--gold);min-height:1.2em;margin-top:1rem}
-/* Ukuran bendera benar-benar seragam di seluruh website */
-.country-flag,
-.player-region .country-flag,
-.dhead .nm .country-flag{
-  display:inline-block !important;
-  width:1.45rem !important;
-  min-width:1.45rem !important;
-  max-width:1.45rem !important;
-  height:.95rem !important;
-  min-height:.95rem !important;
-  max-height:.95rem !important;
-  object-fit:fill !important;
-  object-position:center !important;
-  vertical-align:middle !important;
-  flex:0 0 1.45rem !important;
-  margin:0 !important;
-  padding:0 !important;
-  border:0 !important;
-  border-radius:0 !important;
-  box-shadow:none !important;
-  background:transparent !important;
-}
 
 </style>
 <style id="fix">
@@ -444,7 +422,6 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 .staff-row:hover{background:var(--ink-2);border-color:var(--gold);transform:translateY(-2px)}
 .staff-name{grid-area:name;font-family:var(--hud);font-size:1.25rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
 .staff-name{display:flex;align-items:center;gap:.35rem;line-height:1.2}
-.staff-name .country-flag{align-self:center;position:relative;top:-.04em}
 .staff-role{grid-area:role;display:block;width:max-content;max-width:100%;justify-self:center;align-self:center;text-align:center;color:var(--mute);font-family:var(--hud);font-size:.82rem;font-weight:400;letter-spacing:normal;text-transform:none}
 .staff-more{grid-area:more;justify-self:end;color:var(--gold);font-family:var(--hud);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
 .staff-detail-slot{display:grid;grid-template-rows:0fr;width:100%;min-width:0;opacity:0;overflow:hidden;transition:grid-template-rows .48s cubic-bezier(.22,.7,.2,1),opacity .3s ease;margin:0}
@@ -465,7 +442,6 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 @media (min-width:900px){.staff-detail-card{flex-basis:calc((100% - 3rem)/4)}}
 @media (max-width:600px){.staff-detail-card{flex-basis:calc((100% - .7rem)/2)}.staff-detail-copy{padding:.2rem .5rem .8rem}.staff-detail-copy h5{font-size:1.05rem}.staff-detail-role{font-size:.75rem}}
 .player-region{display:block;color:var(--mute);font-size:.76rem;margin-top:.18rem}
-  .country-flag{display:inline-block;width:auto;height:.9em;max-width:1.7em;object-fit:fill;vertical-align:-.08em;border:0;border-radius:0;box-shadow:none;background:transparent}
   .public-game-group+.public-game-group{margin-top:2rem}
   .public-game-title{font-family:var(--hud);font-size:clamp(1.1rem,2.4vw,1.55rem);font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:0;padding:1rem 1.4rem;border-bottom:1px solid var(--line);background:var(--ink-3)}
   .dhead{gap:clamp(.55rem,2vw,1.2rem);padding:clamp(.9rem,2vw,1.3rem) clamp(.85rem,3vw,1.6rem)}
@@ -567,70 +543,6 @@ td.handle{font-size:1.1rem}
   .news.big h3{font-size:1.7rem}
 }
 
-/* Bendera negara: tinggi visual seragam di semua komponen */
-.country-flag{
-  display:inline-block;
-  height:.95rem;
-  width:auto;
-  max-width:1.65rem;
-  object-fit:contain;
-  object-position:center;
-  vertical-align:middle;
-  margin:0 .12rem 0 0;
-  padding:0;
-  border:0;
-  border-radius:0;
-  box-shadow:none;
-  background:transparent;
-  flex:none;
-}
-.player-region{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:.3rem;
-  line-height:1.4;
-}
-.dhead .nm{
-  display:flex;
-  align-items:center;
-  gap:.35rem;
-  min-width:0;
-}
-.dhead .nm .country-flag{flex:none}
-@media(max-width:600px){
-  .country-flag{height:.95rem;max-width:1.65rem}
-}
-</style>
-
-<style id="global-flag-alignment">
-/* Patokan semua bendera mengikuti ukuran dan rasio bendera Indonesia */
-html body img.country-flag,
-html body .country-flag{
-  display:inline-block !important;
-  box-sizing:border-box !important;
-  width:1.5rem !important;
-  min-width:1.5rem !important;
-  max-width:1.5rem !important;
-  height:1rem !important;
-  min-height:1rem !important;
-  max-height:1rem !important;
-  aspect-ratio:3 / 2 !important;
-  object-fit:fill !important;
-  object-position:center center !important;
-  vertical-align:middle !important;
-  align-self:center !important;
-  flex:0 0 1.5rem !important;
-  position:static !important;
-  top:auto !important;
-  transform:none !important;
-  margin:0 !important;
-  padding:0 !important;
-  border:0 !important;
-  border-radius:0 !important;
-  box-shadow:none !important;
-  background:transparent !important;
-}
 </style>
 
 <style id="verity-division-layout">
@@ -655,7 +567,6 @@ html body .country-flag{
 .division-facts>div{min-width:100px}
 .division-facts dt{margin:0 0 .2rem;color:var(--mute);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase}
 .division-facts dd{display:flex;align-items:center;gap:.4rem;margin:0;color:var(--bone);font-family:var(--hud);font-size:.95rem;font-weight:800}
-.division-facts .country-flag{width:1.3rem!important;min-width:1.3rem!important;height:.86rem!important;min-height:.86rem!important}
 .division-logo{display:flex;align-items:center;justify-content:center;min-width:0;min-height:155px}
 /* Grid animasi Verity seperti latar intro dan beranda, khusus area logo divisi */
 .division-logo{position:relative;isolation:isolate;overflow:hidden}
@@ -741,6 +652,22 @@ html body .country-flag{
 @media(prefers-reduced-motion:reduce){.staff-detail-modal,.staff-detail-modal .staff-detail-card{animation:none}}
 </style>
 
+<style id="country-flag-single-source">
+/* Satu aturan final untuk semua bendera, tanpa pengecualian per komponen. */
+html body img.country-flag{
+  display:inline-block !important;
+  box-sizing:border-box !important;
+  width:24px !important; min-width:24px !important; max-width:24px !important;
+  height:16px !important; min-height:16px !important; max-height:16px !important;
+  aspect-ratio:3 / 2 !important;
+  object-fit:fill !important; object-position:center center !important;
+  vertical-align:middle !important; align-self:center !important; flex:none !important;
+  position:static !important; inset:auto !important; top:auto !important;
+  transform:none !important; margin:0 !important; padding:0 !important;
+  border:0 !important; border-radius:0 !important; box-shadow:none !important;
+  background:transparent !important;
+}
+</style>
 </head>
 <body class="intro-on">
 
