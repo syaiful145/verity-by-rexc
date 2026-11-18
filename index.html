@@ -690,6 +690,16 @@ html body img.country-flag{
  .dbody,.dpad{transition:none!important}
 }
 </style>
+<style id="verity-mobile-roster-last-card-center">
+/* Center the final player card when a two-column mobile roster has an odd count */
+@media (max-width:599px){
+ .pgrid .pc:last-child:nth-child(odd){
+  grid-column:1 / -1;
+  width:calc((100% - .7rem)/2);
+  justify-self:center;
+ }
+}
+</style>
 </head>
 <body class="intro-on">
 
