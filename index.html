@@ -647,7 +647,11 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
       var roster = Array.isArray(rg.roster) ? rg.roster : legacyTeams.reduce(function (all, t) { return all.concat(t.roster || []); }, []);
       return { name: rg.name || "Indonesia", code: rg.code || (rg.name === "Indonesia" ? "ID" : ""), roster: roster, teams: legacyTeams };
     });
-    if (!Array.isArray(d.staff)) d.staff = [];
+    if (!Array.isArray(d.staff)) {
+      d.staff = (d.facts || []).filter(function (f) { return /^(pelatih|coach|manager|manajer)$/i.test(f[0]) && String(f[1] || "").trim(); }).map(function (f) {
+        return { name: String(f[1]).trim(), role: /^(pelatih|coach)$/i.test(f[0]) ? "Coach" : "Manager", detail: "", img: "" };
+      });
+    }
     delete d.roster;
     return d;
   }
@@ -1103,6 +1107,8 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   aBody.addEventListener("change", function (e) {
     if (e.target.id === "aSel") { aSel = +e.target.value; aReg = 0; renderAdmin(); return; }
     if (e.target.id === "aReg") { aReg = +e.target.value; renderAdmin(); return; }
+    var changedPath = e.target.getAttribute("data-path");
+    if (changedPath && e.target.tagName === "SELECT") { setPath(changedPath, e.target.value); persist(); return; }
     var p = e.target.getAttribute("data-img"), f = e.target.files && e.target.files[0];
     if (!p || !f) return;
     var rd = new FileReader();
@@ -1157,7 +1163,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   aBody.addEventListener("submit", function (e) {
     e.preventDefault();
     var f = e.target;
-    if (f.id === "dAdd") S.divisions.push({ id: "d" + Date.now(), name: f.name.value.trim(), game: f.game.value.trim(), desc: "", img: "", facts: [["Pelatih", ""], ["Manajer", ""]], stats: [], regions: [{ name: "Indonesia", teams: [{ name: "Senior", roster: [] }] }] });
+    if (f.id === "dAdd") S.divisions.push({ id: "d" + Date.now(), name: f.name.value.trim(), game: f.game.value.trim(), desc: "", img: "", facts: [["Pelatih", ""], ["Manajer", ""]], stats: [], staff: [], regions: [{ name: "Indonesia", code: "ID", roster: [], teams: [{ name: "Senior", roster: [] }] }] });
     else if (f.id === "regAdd") { S.divisions[aSel].regions.push({ name: f.name.value.trim(), code: f.code.value.trim().toUpperCase(), roster: [] }); aReg = S.divisions[aSel].regions.length - 1; }
     else if (f.id === "rAdd") S.divisions[aSel].regions[aReg].roster.push(["00", f.handle.value.trim(), f.name.value.trim(), f.role.value.trim(), "", ""]);
     else if (f.id === "sAdd") { if (!Array.isArray(S.divisions[aSel].staff)) S.divisions[aSel].staff = []; S.divisions[aSel].staff.push({ name: f.name.value.trim(), role: f.role.value, detail: f.detail.value.trim(), img: "" }); }
