@@ -610,7 +610,7 @@ td.handle{font-size:1.1rem}
   min-height:230px;padding:clamp(1.25rem,3vw,2.25rem);
   margin:0 0 1.45rem;overflow:hidden;
   background:radial-gradient(ellipse at 82% 45%,rgba(255,196,0,.13),transparent 38%),linear-gradient(115deg,var(--ink-2),var(--ink) 72%);
-  border:1px solid rgba(255,196,0,.38);
+  border:1px solid var(--line);
   box-shadow:none;
 }
 .division-hero::before{content:none}
@@ -972,9 +972,10 @@ td.handle{font-size:1.1rem}
     d.regions = [{ name: regionCountryName(divisionCode) || "Indonesia", code: divisionCode, roster: allRoster, teams: [] }];
     if (!Array.isArray(d.staff)) {
       d.staff = (d.facts || []).filter(function (f) { return /^(pelatih|coach|manager|manajer)$/i.test(f[0]) && String(f[1] || "").trim(); }).map(function (f) {
-        return { name: String(f[1]).trim(), role: /^(pelatih|coach)$/i.test(f[0]) ? "Coach" : "Manager", detail: "", img: "" };
+        return { name: String(f[1]).trim(), role: /^(pelatih|coach)$/i.test(f[0]) ? "Coach" : "Manager", code: divisionCode, detail: "", img: "" };
       });
     }
+    (d.staff || []).forEach(function (p) { p.code = String(p.code || divisionCode).toUpperCase(); });
     delete d.roster;
     return d;
   }
@@ -1005,12 +1006,14 @@ td.handle{font-size:1.1rem}
   }
   function regionsHtml(d) {
     var roster = d.regions.reduce(function (all, rg) { return all.concat(rg.roster || []); }, []);
-    return '<section class="reg roster-section"><div class="roster-heading"><div class="rgh"><h4>Roster</h4></div><span class="roster-count">' + roster.length + ' pemain</span></div><div class="pgrid">' + roster.map(playerCard).join("") + '</div></section>';
+    var totalPersonnel = roster.length + (Array.isArray(d.staff) ? d.staff.length : 0);
+    return '<section class="reg roster-section"><div class="roster-heading"><div class="rgh"><h4>Roster</h4></div><span class="roster-count">' + totalPersonnel + ' personel</span></div><div class="pgrid">' + roster.map(playerCard).join("") + '</div></section>';
   }
   function staffHtml(d, divisionIndex) {
     if (!d.staff || !d.staff.length) return "";
     return '<section class="reg staff-section"><div class="rgh"><h4>Manajemen</h4></div><div class="staff-list">' + d.staff.map(function (p, i) {
-      return '<button class="staff-row" type="button" data-staff-detail="' + i + '" data-staff-division="' + divisionIndex + '"><span class="staff-name">' + esc(p.name) + '</span><span class="staff-role">' + esc(p.role) + '</span><span class="staff-more">Lihat detail</span></button>';
+      var code = String(p.code || d.code || "").toUpperCase();
+      return '<button class="staff-row" type="button" data-staff-detail="' + i + '" data-staff-division="' + divisionIndex + '"><span class="staff-name">' + (regionFlag(code) ? regionFlag(code) + " " : "") + esc(p.name) + '</span><span class="staff-role">' + esc(p.role) + '</span><span class="staff-more">Lihat detail</span></button>';
     }).join("") + '</div></section>';
   }
   function showStaffDetail(divisionIndex, staffIndex, staffButton) {
@@ -1025,7 +1028,7 @@ td.handle{font-size:1.1rem}
     modal.setAttribute("aria-modal", "true");
     modal.setAttribute("aria-label", "Detail manajemen " + (p.name || ""));
     modal.setAttribute("data-staff-key", divisionIndex + "-" + staffIndex);
-    modal.innerHTML = '<article class="pc staff-detail-card"><div class="pimg staff-detail-photo">' + (p.img ? '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '">' : SIL) + '</div><div class="pinfo staff-detail-copy"><h5>' + esc(p.name || "") + '</h5>' + (p.role ? '<span class="pn">' + esc(p.role) + '</span>' : '') + (p.detail ? '<p class="staff-detail-text">' + esc(p.detail) + '</p>' : '') + '</div></article>';
+    modal.innerHTML = '<article class="pc staff-detail-card"><div class="pimg staff-detail-photo">' + (p.img ? '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '">' : SIL) + '</div><div class="pinfo staff-detail-copy"><h5>' + esc(p.name || "") + '</h5>' + (p.role ? '<span class="pn">' + esc(p.role) + '</span>' : '') + (p.detail ? '<p class="staff-detail-text">' + esc(p.detail) + '</p>' : '') + '<span class="player-region">' + (regionFlag(p.code || d.code) ? regionFlag(p.code || d.code) + " " : "") + esc(regionCountryName(p.code || d.code) || p.code || d.code || "") + '</span></div></article>';
     var rosterCard = document.querySelector(".roster-section .pgrid .pc");
     if (rosterCard) { var rosterWidth = rosterCard.getBoundingClientRect().width; var detailCard = modal.querySelector(".staff-detail-card"); detailCard.style.width = rosterWidth + "px"; detailCard.style.flexBasis = rosterWidth + "px"; }
     modal.addEventListener("click", function (ev) { if (ev.target === modal) closeStaffDetail(); });
@@ -1043,7 +1046,7 @@ td.handle{font-size:1.1rem}
       return '<section class="public-game-group"><h3 class="public-game-title">' + esc(game.name) + '</h3>' + entries.map(function (entry) {
       var d = entry.division, i = entry.index;
       var facts = d.facts.filter(function (f) { return !/^(pelatih|coach|manager|manajer)$/i.test(f[0]); }).map(function (f) { return '<div><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></div>'; }).join("");
-      var rosterCount = d.regions.reduce(function (total, rg) { return total + (rg.roster || []).length; }, 0);
+      var rosterCount = d.regions.reduce(function (total, rg) { return total + (rg.roster || []).length; }, 0) + (Array.isArray(d.staff) ? d.staff.length : 0);
       var country = regionCountryName(d.code) || d.code || "—";
       return '<div class="dit' + (i === openDiv ? " open" : "") + '" data-i="' + i + '">' +
         '<button class="dhead" type="button" aria-expanded="' + (i === openDiv) + '"><span class="no">' + String(i + 1).padStart(2, "0") + '</span><span class="nm">' + (regionFlag(d.code) ? regionFlag(d.code) + ' ' : '') + esc(d.name) + '</span><span class="gm">' + esc(d.game) + '</span><i class="chev"></i></button>' +
@@ -1467,9 +1470,9 @@ td.handle{font-size:1.1rem}
         d.staff.forEach(function (p, i) {
           var sp = "divisions." + aSel + ".staff." + i;
           h += '<div class="acard"><div class="row">' + fld(sp + ".name", p.name, "Nama personel manajemen") + fld(sp + ".role", p.role || "", "Keterangan / jabatan (contoh: Coach)") + '</div>' +
-            fld(sp + ".detail", p.detail || "", "Detail tambahan", true) + imgFld(sp + ".img", p.img || "", "Foto manajemen") + '<button class="abtn" type="button" data-sdel="' + i + '">Hapus manajemen</button></div>';
+            countryFld(sp + ".code", p.code || d.code, "ID negara manajemen") + fld(sp + ".detail", p.detail || "", "Detail tambahan", true) + imgFld(sp + ".img", p.img || "", "Foto manajemen") + '<button class="abtn" type="button" data-sdel="' + i + '">Hapus manajemen</button></div>';
         });
-        h += '<form class="aform" id="sAdd"><input name="name" placeholder="Nama personel manajemen" required><input name="role" placeholder="Jabatan (mis. Coach, Manager, Analyst)" required><input name="detail" placeholder="Detail tambahan"><button class="btn" type="submit">Tambah manajemen</button></form>';
+        h += '<form class="aform" id="sAdd"><input name="name" placeholder="Nama personel manajemen" required><input name="role" placeholder="Jabatan (mis. Coach, Manager, Analyst)" required><input name="detail" placeholder="Detail tambahan"><input name="code" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" value="" + esc(d.code) + "" placeholder="ID negara (contoh ID, MY, US)" required><button class="btn" type="submit">Tambah manajemen</button></form>';
       }
     } else if (aTab === "his") {
       S.history.forEach(function (x, i) {
@@ -1579,7 +1582,7 @@ td.handle{font-size:1.1rem}
       if (!regionCountryName(playerCode)) { adminMsg("ID negara pemain tidak dikenali. Gunakan kode negara ISO 2 huruf."); return; }
       S.divisions[aSel].regions[0].roster.push(["00", f.name.value.trim(), f.realName.value.trim(), f.position.value.trim(), f.role.value.trim(), "", playerCode]);
     }
-    else if (f.id === "sAdd") { if (!Array.isArray(S.divisions[aSel].staff)) S.divisions[aSel].staff = []; S.divisions[aSel].staff.push({ name: f.name.value.trim(), role: f.role.value.trim(), detail: f.detail.value.trim(), img: "" }); }
+    else if (f.id === "sAdd") { var staffCode = f.code.value.trim().toUpperCase(); if (!regionCountryName(staffCode)) { adminMsg("ID negara manajemen tidak dikenali. Gunakan kode negara ISO 2 huruf."); return; } if (!Array.isArray(S.divisions[aSel].staff)) S.divisions[aSel].staff = []; S.divisions[aSel].staff.push({ name: f.name.value.trim(), role: f.role.value.trim(), code: staffCode, detail: f.detail.value.trim(), img: "" }); }
     else if (f.id === "hAdd") S.history.push({ year: f.year.value.trim(), title: f.title.value.trim(), text: "", img: "" });
     persist(); renderAdmin();
   });
