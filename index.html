@@ -541,6 +541,41 @@ td.handle{font-size:1.1rem}
   .staff-name,.staff-detail-copy h5,.pinfo h5{font-size:var(--type-card-title)}
   .news.big h3{font-size:1.7rem}
 }
+
+/* Bendera negara: tinggi visual seragam di semua komponen */
+.country-flag{
+  display:inline-block;
+  height:.95rem;
+  width:auto;
+  max-width:1.65rem;
+  object-fit:contain;
+  object-position:center;
+  vertical-align:middle;
+  margin:0 .12rem 0 0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:transparent;
+  flex:none;
+}
+.player-region{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.3rem;
+  line-height:1.4;
+}
+.dhead .nm{
+  display:flex;
+  align-items:center;
+  gap:.35rem;
+  min-width:0;
+}
+.dhead .nm .country-flag{flex:none}
+@media(max-width:600px){
+  .country-flag{height:.95rem;max-width:1.65rem}
+}
 </style>
 </head>
 <body class="intro-on">
