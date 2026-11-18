@@ -645,6 +645,13 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     d.regions = d.regions.map(function (rg) {
       var legacyTeams = Array.isArray(rg.teams) ? rg.teams : [];
       var roster = Array.isArray(rg.roster) ? rg.roster : legacyTeams.reduce(function (all, t) { return all.concat(t.roster || []); }, []);
+      roster = roster.map(function (p) {
+        if (!Array.isArray(p)) return p;
+        var position = String(p[3] || ""), role = String(p[4] || "");
+        if (role === "lead") { role = "Kapten"; position = position.replace(/^Kapten\s*[·-]\s*/i, ""); }
+        else if (role === "sub") role = "Cadangan";
+        return [p[0], p[1], p[2], position, role, p[5] || ""];
+      });
       return { name: rg.name || "Indonesia", code: rg.code || (rg.name === "Indonesia" ? "ID" : ""), roster: roster, teams: legacyTeams };
     });
     if (!Array.isArray(d.staff)) {
@@ -660,9 +667,9 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   var dacc = document.getElementById("dacc"), openDiv = -1;
   var SIL = '<svg viewBox="0 0 120 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><circle cx="60" cy="52" r="23" fill="#2b2b33" stroke="rgba(255,196,0,.35)" stroke-width="1.5"/><path d="M12 150c2-34 20-52 48-52s46 18 48 52z" fill="#26262d" stroke="rgba(255,196,0,.35)" stroke-width="1.5"/><path d="M60 98l-12 14 12 38 12-38z" fill="#1b1b20"/></svg>';
   function playerCard(p) {
-    var tag = p[4] === "lead" ? '<span class="ptag">Kapten</span>' : (p[4] === "sub" ? '<span class="ptag">Cadangan</span>' : "");
+    var tag = p[4] ? '<span class="ptag">' + esc(p[4]) + '</span>' : "";
     return '<article class="pc"><div class="pimg">' + (p[5] ? '<img src="' + p[5] + '" alt="' + esc(p[1]) + '">' : SIL) + tag + '</div>' +
-      '<div class="pinfo"><h5>' + esc(p[1]) + '</h5><span class="pn">' + esc(p[2]) + '</span><span class="pr">' + esc(p[3]) + '</span></div></article>';
+      '<div class="pinfo"><h5>' + esc(p[1]) + '</h5>' + (p[2] ? '<span class="pn">' + esc(p[2]) + '</span>' : '') + (p[3] ? '<span class="pr">' + esc(p[3]) + '</span>' : '') + '</div></article>';
   }
   function regionFlag(code) {
     code = String(code || "").toUpperCase();
@@ -673,7 +680,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     if (!/^[A-Z]{2}$/.test(code)) return "";
     try {
       var name = new Intl.DisplayNames(["id"], { type: "region" }).of(code);
-      return name && name.toUpperCase() !== code ? name : "";
+      return name && name.toUpperCase() !== code && !/unknown|tidak dikenal/i.test(name) ? name : "";
     } catch (e) { return ""; }
   }
   function regionLabel(rg) {
@@ -1008,7 +1015,11 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     S.divisions.forEach(function (d) {
       d.regions.forEach(function (g) {
         g.roster.forEach(function (p, i) { p[0] = String(i + 1).padStart(2, "0"); });
-        g.teams = [{ name: "Senior", roster: g.roster }];
+        g.teams = [{ name: "Senior", roster: g.roster.map(function (p) {
+          var legacyRole = p[4] === "Kapten" ? "lead" : (p[4] === "Cadangan" ? "sub" : "");
+          var legacyPosition = [p[4], p[3]].filter(Boolean).join(" · ");
+          return [p[0], p[1], p[2], legacyPosition, legacyRole, p[5] || ""];
+        }) }];
       });
     });
     renderAll();
@@ -1073,10 +1084,10 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
         if (rg) {
           rg.roster.forEach(function (r, i) {
             var p = rp + ".roster." + i;
-            h += '<div class="acard"><div class="row">' + fld(p + ".1", r[1], "Handle") + fld(p + ".2", r[2], "Nama lengkap") + fld(p + ".3", r[3], "Peran") + '</div>' +
-              imgFld(p + ".5", r[5] || "", "Foto pemain") + '<div><button class="abtn" type="button" data-rdel="' + i + '">Hapus pemain</button></div></div>';
+            h += '<div class="acard"><div class="row">' + fld(p + ".1", r[1], "Nama / nickname") + fld(p + ".2", r[2] || "", "Nama asli (opsional)") + '</div><div class="row">' + fld(p + ".3", r[3] || "", "Posisi bermain (contoh: Sniper, Jungler)") + fld(p + ".4", r[4] || "", "Peran / tugas (contoh: Kapten)") + '</div>' +
+              imgFld(p + ".5", r[5] || "", "Foto anggota roster") + '<div><button class="abtn" type="button" data-rdel="' + i + '">Hapus anggota</button></div></div>';
           });
-          h += '<form class="aform" id="rAdd"><input name="handle" placeholder="Handle" required><input name="name" placeholder="Nama lengkap"><input name="role" placeholder="Peran"><button class="btn" type="submit">Tambah pemain</button></form>';
+          h += '<form class="aform" id="rAdd"><input name="name" placeholder="Nama / nickname" required><input name="realName" placeholder="Nama asli (opsional)"><input name="position" placeholder="Posisi bermain (Sniper, Jungler, dll.)"><input name="role" placeholder="Peran / tugas (Kapten, dll.)"><button class="btn" type="submit">Tambah anggota roster</button></form>';
         }
       }
     } else if (aTab === "staff") {
@@ -1177,7 +1188,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     var f = e.target;
     if (f.id === "dAdd") S.divisions.push({ id: "d" + Date.now(), name: f.name.value.trim(), game: f.game.value.trim(), desc: "", img: "", facts: [["Pelatih", ""], ["Manajer", ""]], stats: [], staff: [], regions: [{ name: "Indonesia", code: "ID", roster: [], teams: [{ name: "Senior", roster: [] }] }] });
     else if (f.id === "regAdd") { var countryCode = f.code.value.trim().toUpperCase(), countryName = regionCountryName(countryCode); if (!countryName) { adminMsg("ID negara tidak dikenali. Masukkan kode negara ISO 2 huruf, misalnya ID, US, atau JP."); return; } S.divisions[aSel].regions.push({ name: countryName, code: countryCode, roster: [], teams: [] }); aReg = S.divisions[aSel].regions.length - 1; }
-    else if (f.id === "rAdd") S.divisions[aSel].regions[aReg].roster.push(["00", f.handle.value.trim(), f.name.value.trim(), f.role.value.trim(), "", ""]);
+    else if (f.id === "rAdd") S.divisions[aSel].regions[aReg].roster.push(["00", f.name.value.trim(), f.realName.value.trim(), f.position.value.trim(), f.role.value.trim(), ""]);
     else if (f.id === "sAdd") { if (!Array.isArray(S.divisions[aSel].staff)) S.divisions[aSel].staff = []; S.divisions[aSel].staff.push({ name: f.name.value.trim(), role: f.role.value.trim(), detail: f.detail.value.trim(), img: "" }); }
     else if (f.id === "hAdd") S.history.push({ year: f.year.value.trim(), title: f.title.value.trim(), text: "", img: "" });
     persist(); renderAdmin();
