@@ -1026,6 +1026,8 @@ td.handle{font-size:1.1rem}
     modal.setAttribute("aria-label", "Detail manajemen " + (p.name || ""));
     modal.setAttribute("data-staff-key", divisionIndex + "-" + staffIndex);
     modal.innerHTML = '<article class="pc staff-detail-card"><div class="pimg staff-detail-photo">' + (p.img ? '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '">' : SIL) + '</div><div class="pinfo staff-detail-copy"><h5>' + esc(p.name || "") + '</h5>' + (p.role ? '<span class="pn">' + esc(p.role) + '</span>' : '') + (p.detail ? '<p class="staff-detail-text">' + esc(p.detail) + '</p>' : '') + '</div></article>';
+    var rosterCard = document.querySelector(".roster-section .pgrid .pc");
+    if (rosterCard) { var rosterWidth = rosterCard.getBoundingClientRect().width; var detailCard = modal.querySelector(".staff-detail-card"); detailCard.style.width = rosterWidth + "px"; detailCard.style.flexBasis = rosterWidth + "px"; }
     modal.addEventListener("click", function (ev) { if (ev.target === modal) closeStaffDetail(); });
     document.body.appendChild(modal);
   }
