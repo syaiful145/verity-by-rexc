@@ -687,16 +687,39 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     return regionCountryName(rg.code) || rg.name || rg.code || "Region";
   }
   function regionsHtml(d) {
-    return d.regions.map(function (rg) {
-      var flag = regionFlag(rg.code);
-      return '<section class="reg"><div class="rgh"><h4>' + (flag ? flag + ' ' : '') + esc(regionLabel(rg)) + '</h4></div><div class="tmh"><span>' + rg.roster.length + ' pemain</span></div><div class="pgrid">' + rg.roster.map(playerCard).join("") + '</div></section>';
-    }).join("") || '<p class="muted">Belum ada region.</p>';
+    var roster = d.regions.reduce(function (all, rg) { return all.concat(rg.roster || []); }, []);
+    return '<section class="reg"><div class="rgh"><h4>Roster</h4></div><div class="tmh"><span>' + roster.length + ' pemain</span></div><div class="pgrid">' + roster.map(playerCard).join("") + '</div></section>';
   }
-  function staffHtml(d) {
+  function staffHtml(d, divisionIndex) {
     if (!d.staff || !d.staff.length) return "";
-    return '<section class="reg staff-section"><div class="rgh"><h4>Manajemen</h4></div><div class="pgrid">' + d.staff.map(function (p) {
-      return '<article class="pc"><div class="pimg">' + (p.img ? '<img src="' + p.img + '" alt="' + esc(p.name) + '">' : SIL) + '</div><div class="pinfo"><h5>' + esc(p.name) + '</h5><span class="pr">' + esc(p.role) + '</span><details><summary>Lihat detail</summary><span class="pn">' + esc(p.detail || p.name) + '</span></details></div></article>';
+    return '<section class="reg staff-section"><div class="rgh"><h4>Manajemen</h4></div><div class="staff-list">' + d.staff.map(function (p, i) {
+      return '<button class="staff-row" type="button" data-staff-detail="' + i + '" data-staff-division="' + divisionIndex + '"><span class="staff-name">' + esc(p.name) + '</span><span class="staff-role">' + esc(p.role) + '</span><span class="staff-more">Lihat detail</span></button>';
     }).join("") + '</div></section>';
+  }
+  function showStaffDetail(divisionIndex, staffIndex) {
+    var d = S.divisions[divisionIndex], p = d && d.staff && d.staff[staffIndex];
+    if (!p) return;
+    var modal = document.getElementById("staffDetailModal");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "staffDetailModal"; modal.className = "staff-modal";
+      modal.innerHTML = '<div class="staff-modal-card" role="dialog" aria-modal="true" aria-labelledby="staffModalName"><button class="staff-modal-close" type="button" aria-label="Tutup">×</button><div class="staff-modal-photo"></div><div class="staff-modal-copy"><h3 id="staffModalName"></h3><p class="staff-modal-role"></p><p class="staff-modal-detail"></p></div></div>';
+      document.body.appendChild(modal);
+      modal.addEventListener("click", function (ev) { if (ev.target === modal || ev.target.closest(".staff-modal-close")) closeStaffDetail(); });
+    }
+    modal.querySelector(".staff-modal-photo").innerHTML = p.img ? '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '">' : SIL;
+    modal.querySelector("#staffModalName").textContent = p.name || "";
+    modal.querySelector(".staff-modal-role").textContent = p.role || "";
+    modal.querySelector(".staff-modal-detail").textContent = p.detail || "";
+    modal.hidden = false; modal.classList.remove("open");
+    requestAnimationFrame(function () { modal.classList.add("open"); });
+    document.body.style.overflow = "hidden";
+  }
+  function closeStaffDetail() {
+    var modal = document.getElementById("staffDetailModal");
+    if (!modal) return;
+    modal.classList.remove("open"); document.body.style.overflow = "";
+    setTimeout(function () { if (!modal.classList.contains("open")) modal.hidden = true; }, 300);
   }
   function renderDivList() {
     dacc.innerHTML = S.divisions.map(function (d, i) {
@@ -705,11 +728,14 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
         '<button class="dhead" type="button" aria-expanded="' + (i === openDiv) + '"><span class="no">' + String(i + 1).padStart(2, "0") + '</span><span class="nm">' + esc(d.name) + '</span><span class="gm">' + esc(d.game) + '</span><i class="chev"></i></button>' +
         '<div class="dbody"><div class="dinner"><div class="dpad">' + (d.img ? '<img class="dimg" src="' + d.img + '" alt="">' : "") +
         '<div class="ptop"><div><p class="game">' + esc(d.game) + '</p><p>' + esc(d.desc) + '</p></div><dl class="facts">' + facts + '</dl></div>' +
-        staffHtml(d) + regionsHtml(d) + '</div></div></div></div>';
+        staffHtml(d, i) + regionsHtml(d) + '</div></div></div></div>';
     }).join("") || '<p class="muted" style="padding:1.5rem">Belum ada divisi.</p>';
     var c = document.getElementById("cntDiv"); if (c) c.textContent = String(S.divisions.length).padStart(2, "0");
   }
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeStaffDetail(); });
   dacc.addEventListener("click", function (e) {
+    var staffButton = e.target.closest("[data-staff-detail]");
+    if (staffButton) { showStaffDetail(+staffButton.getAttribute("data-staff-division"), +staffButton.getAttribute("data-staff-detail")); return; }
     var b = e.target.closest(".dhead"); if (!b) return;
     var it = b.parentElement, i = +it.getAttribute("data-i"), was = it.classList.contains("open");
     dacc.querySelectorAll(".dit.open").forEach(function (x) { x.classList.remove("open"); x.firstChild.setAttribute("aria-expanded", "false"); });
