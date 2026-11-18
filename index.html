@@ -1081,6 +1081,9 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     var tag = area ? "textarea" : "input";
     return '<label>' + esc(label) + '<' + tag + ' data-path="' + path + '"' + (area ? '>' + esc(val) + '</textarea>' : ' value="' + esc(val) + '">') + '</label>';
   }
+  function countryFld(path, val, label) {
+    return '<label>' + esc(label) + '<input data-path="' + path + '" value="' + esc(val || "") + '" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" placeholder="ID, MY, US, JP"></label>';
+  }
   function imgFld(path, val, label) {
     return '<label>' + esc(label) + '</label>' + (val ? '<img class="athumb" src="' + val + '" alt="">' : "") +
       '<div><input type="file" accept="image/*" data-img="' + path + '"> ' + (val ? '<button class="abtn" type="button" data-clr="' + path + '">Hapus foto</button>' : "") + '</div>';
@@ -1090,31 +1093,27 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     if (aTab === "div") {
       S.divisions.forEach(function (d, i) {
         var p = "divisions." + i;
-        h += '<div class="acard"><div class="row">' + fld(p + ".name", d.name, "Nama divisi") + fld(p + ".game", d.game, "Game") + '</div>' +
+        h += '<div class="acard"><div class="row">' + fld(p + ".name", d.name, "Nama divisi") + fld(p + ".game", d.game, "Game") + countryFld(p + ".code", d.code, "ID negara divisi") + '</div>' +
           fld(p + ".desc", d.desc, "Deskripsi", true) +
           '<div class="row">' + d.facts.map(function (f, j) { return /^(pelatih|coach|manager|manajer)$/i.test(f[0]) ? "" : fld(p + ".facts." + j + ".1", f[1], f[0]); }).join("") +
           '</div>' +
           imgFld(p + ".img", d.img, "Foto divisi") +
           '<div><button class="abtn" type="button" data-ddel="' + i + '">Hapus divisi</button></div></div>';
       });
-      h += '<form class="aform" id="dAdd"><input name="name" placeholder="Nama divisi baru" required><input name="game" placeholder="Game" required><button class="btn" type="submit">Tambah divisi</button></form>';
+      h += '<form class="aform" id="dAdd"><input name="name" placeholder="Nama divisi baru" required><input name="game" placeholder="Game" required><input name="code" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" placeholder="ID negara (contoh ID)" required><button class="btn" type="submit">Tambah divisi</button></form>';
     } else if (aTab === "ros") {
       if (aSel >= S.divisions.length) aSel = 0;
       h += '<label class="alabel">Divisi <select id="aSel">' + S.divisions.map(function (d, i) { return '<option value="' + i + '"' + (i === aSel ? " selected" : "") + '>' + esc(d.name) + '</option>'; }).join("") + '</select></label>';
       var d = S.divisions[aSel];
       if (d) {
-        if (aReg >= d.regions.length) aReg = 0;
-        var rg = d.regions[aReg], rp = "divisions." + aSel + ".regions." + aReg;
-        h += '<div class="acard"><label class="alabel">Pilih region <select id="aReg">' + d.regions.map(function (g, i) { return '<option value="' + i + '"' + (i === aReg ? " selected" : "") + '>' + esc(regionLabel(g)) + '</option>'; }).join("") + '</select></label>' +
-          (rg ? '<p class="muted">Region aktif: ' + esc((regionFlag(rg.code) || "") + " " + regionLabel(rg)) + '</p><div><button class="abtn" type="button" data-regdel="1">Hapus region</button></div>' : '') + '</div>' +
-          '<form class="aform" id="regAdd"><label>ID negara (ISO 2 huruf)<input name="code" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" placeholder="Contoh: ID, MY, US, JP" required></label><button class="btn" type="submit">Tambah region</button></form>';
+        var rp = "divisions." + aSel + ".regions.0", rg = d.regions[0];
         if (rg) {
           rg.roster.forEach(function (r, i) {
             var p = rp + ".roster." + i;
-            h += '<div class="acard"><div class="row">' + fld(p + ".1", r[1], "Nama / nickname") + fld(p + ".2", r[2] || "", "Nama asli (opsional)") + '</div><div class="row">' + fld(p + ".3", r[3] || "", "Posisi bermain (contoh: Sniper, Jungler)") + fld(p + ".4", r[4] || "", "Peran / tugas (contoh: Kapten)") + '</div>' +
-              imgFld(p + ".5", r[5] || "", "Foto anggota roster") + '<div><button class="abtn" type="button" data-rdel="' + i + '">Hapus anggota</button></div></div>';
+            h += '<div class="acard"><div class="row">' + fld(p + ".1", r[1], "Nama / nickname") + fld(p + ".2", r[2] || "", "Nama asli (opsional)") + '</div><div class="row">' + fld(p + ".3", r[3] || "", "Posisi bermain (contoh: Sniper, Jungler)") + fld(p + ".4", r[4] || "", "Peran / tugas (contoh: Kapten)") + countryFld(p + ".6", r[6] || d.code, "ID negara pemain") + '</div>' +
+              imgFld(p + ".5", r[5] || "", "Foto pemain") + '<div><button class="abtn" type="button" data-rdel="' + i + '">Hapus pemain</button></div></div>';
           });
-          h += '<form class="aform" id="rAdd"><input name="name" placeholder="Nama / nickname" required><input name="realName" placeholder="Nama asli (opsional)"><input name="position" placeholder="Posisi bermain (Sniper, Jungler, dll.)"><input name="role" placeholder="Peran / tugas (Kapten, dll.)"><button class="btn" type="submit">Tambah anggota roster</button></form>';
+          h += '<form class="aform" id="rAdd"><input name="name" placeholder="Nama / nickname" required><input name="realName" placeholder="Nama asli (opsional)"><input name="position" placeholder="Posisi bermain (Sniper, Jungler, dll.)"><input name="role" placeholder="Peran / tugas (Kapten, dll.)"><input name="code" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" placeholder="ID negara pemain (contoh ID, MY, US)" required><button class="btn" type="submit">Tambah pemain</button></form>';
         }
       }
     } else if (aTab === "staff") {
