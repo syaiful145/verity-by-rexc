@@ -1,6 +1,11 @@
 import { del } from "@vercel/blob";
 import { getDb, isAdmin, checkOrigin, readBody, sendJson } from "./_shared.js";
 
+// Use the same public Blob store for Preview uploads and cleanup; Production stays unchanged.
+if (process.env.VERCEL_ENV === "preview" && process.env.PUBLIC_BLOB_STORE_ID) {
+  process.env.BLOB_STORE_ID = process.env.PUBLIC_BLOB_STORE_ID;
+}
+
 function collectBlobUrls(value, urls = new Set()) {
   if (typeof value === "string") {
     try {
