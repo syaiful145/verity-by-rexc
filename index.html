@@ -1149,10 +1149,10 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
         if (!Array.isArray(d.staff)) d.staff = [];
         d.staff.forEach(function (p, i) {
           var sp = "divisions." + aSel + ".staff." + i;
-          h += '<div class="acard"><div class="row">' + fld(sp + ".name", p.name, "Nama anggota") + fld(sp + ".role", p.role || "", "Keterangan / jabatan (contoh: Coach)") + '</div>' +
-            fld(sp + ".detail", p.detail || "", "Detail tambahan", true) + imgFld(sp + ".img", p.img || "", "Foto anggota") + '<button class="abtn" type="button" data-sdel="' + i + '">Hapus anggota</button></div>';
+          h += '<div class="acard"><div class="row">' + fld(sp + ".name", p.name, "Nama personel manajemen") + fld(sp + ".role", p.role || "", "Keterangan / jabatan (contoh: Coach)") + '</div>' +
+            fld(sp + ".detail", p.detail || "", "Detail tambahan", true) + imgFld(sp + ".img", p.img || "", "Foto manajemen") + '<button class="abtn" type="button" data-sdel="' + i + '">Hapus manajemen</button></div>';
         });
-        h += '<form class="aform" id="sAdd"><input name="name" placeholder="Nama anggota" required><input name="role" placeholder="Keterangan / jabatan (mis. Coach, Manager, Analyst)" required><input name="detail" placeholder="Detail tambahan"><button class="btn" type="submit">Tambah anggota</button></form>';
+        h += '<form class="aform" id="sAdd"><input name="name" placeholder="Nama personel manajemen" required><input name="role" placeholder="Jabatan (mis. Coach, Manager, Analyst)" required><input name="detail" placeholder="Detail tambahan"><button class="btn" type="submit">Tambah manajemen</button></form>';
       }
     } else if (aTab === "his") {
       S.history.forEach(function (x, i) {
