@@ -6,6 +6,12 @@ export const config = {
   api: { bodyParser: false }
 };
 
+// Keep Production on the existing store. Preview uses the separately
+// connected public store so public image uploads match the store's access mode.
+if (process.env.VERCEL_ENV === "preview" && process.env.PUBLIC_BLOB_STORE_ID) {
+  process.env.BLOB_STORE_ID = process.env.PUBLIC_BLOB_STORE_ID;
+}
+
 const MAX_BYTES = 4 * 1024 * 1024;
 const TYPES = {
   "image/jpeg": "jpg",
