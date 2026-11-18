@@ -654,16 +654,27 @@ td.handle{font-size:1.1rem}
 
 <style id="country-flag-single-source">
 /* Satu aturan final untuk semua bendera, tanpa pengecualian per komponen. */
+html body .country-flag-wrap{
+  display:inline-flex !important;
+  box-sizing:border-box !important;
+  width:24px !important; min-width:24px !important; max-width:24px !important;
+  height:16px !important; min-height:16px !important; max-height:16px !important;
+  align-items:center !important; justify-content:center !important;
+  vertical-align:middle !important;
+  line-height:0 !important;
+  flex:0 0 24px !important;
+  position:relative !important;
+  top:-.08em !important;
+  margin:0 .12em 0 0 !important; padding:0 !important;
+}
 html body img.country-flag{
-  display:inline-block !important;
+  display:block !important;
   box-sizing:border-box !important;
   width:24px !important; min-width:24px !important; max-width:24px !important;
   height:16px !important; min-height:16px !important; max-height:16px !important;
   aspect-ratio:3 / 2 !important;
   object-fit:fill !important; object-position:center center !important;
-  vertical-align:middle !important; align-self:center !important; flex:none !important;
-  position:static !important; inset:auto !important; top:auto !important;
-  transform:none !important; margin:0 !important; padding:0 !important;
+  margin:0 !important; padding:0 !important;
   border:0 !important; border-radius:0 !important; box-shadow:none !important;
   background:transparent !important;
 }
@@ -950,7 +961,7 @@ html body img.country-flag{
   }
   function regionFlag(code) {
     code = String(code || "").trim().toLowerCase();
-    return /^[a-z]{2}$/.test(code) ? '<img class="country-flag" src="https://flagcdn.com/' + code + '.svg" alt="Bendera ' + code.toUpperCase() + '" loading="lazy" decoding="async">' : "";
+    return /^[a-z]{2}$/.test(code) ? '<span class="country-flag-wrap"><img class="country-flag" src="https://flagcdn.com/' + code + '.svg" alt="Bendera ' + code.toUpperCase() + '" loading="lazy" decoding="async"></span>' : "";
   }
   function regionCountryName(code) {
     code = String(code || "").trim().toUpperCase();
