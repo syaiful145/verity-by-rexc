@@ -656,10 +656,13 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     return '<article class="pc' + (p[4] === "lead" ? " lead" : "") + '"><div class="pimg">' + (p[5] ? '<img src="' + p[5] + '" alt="' + esc(p[1]) + '">' : SIL) + tag + '</div>' +
       '<div class="pinfo"><h5>' + esc(p[1]) + '</h5><span class="pn">' + esc(p[2]) + '</span><span class="pr">' + esc(p[3]) + '</span></div></article>';
   }
+  function regionFlag(code) {
+    return /^[A-Z]{2}$/.test(code || "") ? String.fromCodePoint(127397 + code.charCodeAt(0), 127397 + code.charCodeAt(1)) : "";
+  }
   function regionsHtml(d) {
     return d.regions.map(function (rg) {
-      var flag = rg.code ? '<img class="region-flag" src="https://flagcdn.com/w40/' + esc(rg.code.toLowerCase()) + '.png" alt="Bendera ' + esc(rg.name) + '">' : "";
-      return '<section class="reg"><div class="rgh">' + flag + '<h4>' + esc(rg.name) + '</h4></div><div class="tmh"><span>' + rg.roster.length + ' pemain</span></div><div class="pgrid">' + rg.roster.map(playerCard).join("") + '</div></section>';
+      var flag = regionFlag(rg.code);
+      return '<section class="reg"><div class="rgh"><h4>' + (flag ? flag + ' ' : '') + esc(rg.name) + '</h4></div><div class="tmh"><span>' + rg.roster.length + ' pemain</span></div><div class="pgrid">' + rg.roster.map(playerCard).join("") + '</div></section>';
     }).join("") || '<p class="muted">Belum ada region.</p>';
   }
   function staffHtml(d) {
@@ -670,7 +673,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   }
   function renderDivList() {
     dacc.innerHTML = S.divisions.map(function (d, i) {
-      var facts = d.facts.map(function (f) { return '<div><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></div>'; }).join("");
+      var facts = d.facts.filter(function (f) { return !/^(pelatih|coach|manager|manajer)$/i.test(f[0]); }).map(function (f) { return '<div><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></div>'; }).join("");
       return '<div class="dit' + (i === openDiv ? " open" : "") + '" data-i="' + i + '">' +
         '<button class="dhead" type="button" aria-expanded="' + (i === openDiv) + '"><span class="no">' + String(i + 1).padStart(2, "0") + '</span><span class="nm">' + esc(d.name) + '</span><span class="gm">' + esc(d.game) + '</span><i class="chev"></i></button>' +
         '<div class="dbody"><div class="dinner"><div class="dpad">' + (d.img ? '<img class="dimg" src="' + d.img + '" alt="">' : "") +
@@ -1026,7 +1029,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
         var p = "divisions." + i;
         h += '<div class="acard"><div class="row">' + fld(p + ".name", d.name, "Nama divisi") + fld(p + ".game", d.game, "Game") + '</div>' +
           fld(p + ".desc", d.desc, "Deskripsi", true) +
-          '<div class="row">' + d.facts.map(function (f, j) { return fld(p + ".facts." + j + ".1", f[1], f[0]); }).join("") +
+          '<div class="row">' + d.facts.map(function (f, j) { return /^(pelatih|coach|manager|manajer)$/i.test(f[0]) ? "" : fld(p + ".facts." + j + ".1", f[1], f[0]); }).join("") +
           '</div>' +
           imgFld(p + ".img", d.img, "Foto divisi") +
           '<div><button class="abtn" type="button" data-ddel="' + i + '">Hapus divisi</button></div></div>';
@@ -1040,8 +1043,8 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
         if (aReg >= d.regions.length) aReg = 0;
         var rg = d.regions[aReg], rp = "divisions." + aSel + ".regions." + aReg;
         h += '<div class="acard"><label class="alabel">Pilih region <select id="aReg">' + d.regions.map(function (g, i) { return '<option value="' + i + '"' + (i === aReg ? " selected" : "") + '>' + esc(g.name) + '</option>'; }).join("") + '</select></label>' +
-          (rg ? fld(rp + ".name", rg.name, "Nama region") + fld(rp + ".code", rg.code || "", "Kode negara (ID, MY, PH, SG)") + '<div><button class="abtn" type="button" data-regdel="1">Hapus region</button></div>' : '') + '</div>' +
-          '<form class="aform" id="regAdd"><input name="name" placeholder="Nama region (mis. Indonesia)" required><input name="code" placeholder="Kode negara (mis. ID)" maxlength="2" required><button class="btn" type="submit">Tambah region</button></form>';
+          (rg ? fld(rp + ".name", rg.name, "Nama region") + '<label>Kode negara<select data-path="' + rp + '.code"><option value="">Pilih negara</option>' + [['ID','Indonesia'],['MY','Malaysia'],['PH','Filipina'],['SG','Singapura'],['TH','Thailand'],['VN','Vietnam'],['MM','Myanmar'],['KH','Kamboja'],['LA','Laos'],['BN','Brunei'],['TL','Timor-Leste']].map(function (c) { return '<option value="' + c[0] + '"' + (rg.code === c[0] ? ' selected' : '') + '>' + c[1] + '</option>'; }).join("") + '</select></label>' + '<div><button class="abtn" type="button" data-regdel="1">Hapus region</button></div>' : '') + '</div>' +
+          '<form class="aform" id="regAdd"><input name="name" placeholder="Nama region (mis. Indonesia)" required><select name="code" required><option value="">Pilih negara untuk bendera</option><option value="ID">Indonesia</option><option value="MY">Malaysia</option><option value="PH">Filipina</option><option value="SG">Singapura</option><option value="TH">Thailand</option><option value="VN">Vietnam</option><option value="MM">Myanmar</option><option value="KH">Kamboja</option><option value="LA">Laos</option><option value="BN">Brunei</option><option value="TL">Timor-Leste</option></select><button class="btn" type="submit">Tambah region</button></form>';
         if (rg) {
           rg.roster.forEach(function (r, i) {
             var p = rp + ".roster." + i;
