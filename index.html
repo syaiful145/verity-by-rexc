@@ -422,9 +422,9 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 .staff-name{font-family:var(--hud);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
 .staff-role{color:var(--mute);font-size:.9rem;text-align:center}
 .staff-more{color:var(--gold);font-family:var(--hud);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
-.staff-detail-slot{display:flex;justify-content:center;overflow:hidden;max-height:0;opacity:0;transform:translateY(-18px);transition:max-height .55s ease,opacity .35s ease,transform .55s cubic-bezier(.2,.8,.2,1);margin:0}
+.staff-detail-slot{display:flex;width:100%;justify-content:center;align-items:center;overflow:hidden;max-height:0;opacity:0;transform:translateY(-18px);transition:max-height .55s ease,opacity .35s ease,transform .55s cubic-bezier(.2,.8,.2,1);margin:0}
 .staff-detail-slot.open{max-height:1000px;opacity:1;transform:translateY(0);margin:.9rem 0 1.2rem}
-.staff-detail-card{flex:0 0 calc((100% - 1rem)/2);min-width:0}
+.staff-detail-card{flex:0 0 calc((100% - 1rem)/2);min-width:0;margin-inline:auto}
 .staff-detail-photo{position:relative;aspect-ratio:4/5;background:radial-gradient(ellipse at 50% 18%,rgba(255,196,0,.22),transparent 62%),linear-gradient(#1d1d23,#101013);overflow:hidden}
 .staff-detail-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block}
 .staff-detail-photo svg{position:absolute;inset:0;width:100%;height:100%}
@@ -631,8 +631,8 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   <main class="wrap block">
     <div class="head"><h2>Dashboard <span>admin</span></h2><p>Perubahan tersimpan di perangkat ini.</p></div>
     <div class="atabs" role="tablist" id="atabs">
-      <button class="atab on" data-a="div" type="button">Divisi</button>
-      <button class="atab" data-a="games" type="button">Game</button>
+      <button class="atab on" data-a="games" type="button">Game</button>
+      <button class="atab" data-a="div" type="button">Divisi</button>
       <button class="atab" data-a="ros" type="button">Roster</button>
       <button class="atab" data-a="staff" type="button">Manajemen</button>
       <button class="atab" data-a="his" type="button">Sejarah</button>
@@ -1094,7 +1094,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   document.getElementById("logoutAdmin").addEventListener("click", logout);
 
   /* Admin */
-  var aBody = document.getElementById("aBody"), aMsg = document.getElementById("aMsg"), aTab = "div", aSel = 0, aReg = 0, aTm = 0;
+  var aBody = document.getElementById("aBody"), aMsg = document.getElementById("aMsg"), aTab = "games", aSel = 0, aReg = 0, aTm = 0;
   function adminMsg(t) { aMsg.textContent = t; }
   var saveTimer = null, saveVersion = 0;
   function persist() {
@@ -1178,7 +1178,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
         '</select><input name="code" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" placeholder="ID negara (contoh ID)" required><button class="btn" type="submit"' + (!S.games.length ? ' disabled' : '') + '>Tambah divisi</button></form>';
     } else if (aTab === "ros") {
       if (aSel >= S.divisions.length) aSel = 0;
-      h += '<label class="alabel">Divisi <select id="aSel">' + S.divisions.map(function (d, i) { return '<option value="' + i + '"' + (i === aSel ? " selected" : "") + '>' + esc(d.name) + '</option>'; }).join("") + '</select></label>';
+      h += '<label class="alabel">Divisi <select id="aSel">' + S.divisions.map(function (d, i) { return '<option value="' + i + '"' + (i === aSel ? " selected" : "") + '>' + esc((S.games.find(function (g) { return g.id === d.gameId; }) || {}).name || d.game) + ' · ' + esc(d.name) + '</option>'; }).join("") + '</select></label>';
       var d = S.divisions[aSel];
       if (d) {
         var rp = "divisions." + aSel + ".regions.0", rg = d.regions[0];
@@ -1193,7 +1193,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
       }
     } else if (aTab === "staff") {
       if (aSel >= S.divisions.length) aSel = 0;
-      h += '<label class="alabel">Divisi <select id="aSel">' + S.divisions.map(function (d, i) { return '<option value="' + i + '"' + (i === aSel ? " selected" : "") + '>' + esc(d.name) + '</option>'; }).join("") + '</select></label>';
+      h += '<label class="alabel">Divisi <select id="aSel">' + S.divisions.map(function (d, i) { return '<option value="' + i + '"' + (i === aSel ? " selected" : "") + '>' + esc((S.games.find(function (g) { return g.id === d.gameId; }) || {}).name || d.game) + ' · ' + esc(d.name) + '</option>'; }).join("") + '</select></label>';
       var d = S.divisions[aSel];
       if (d) {
         if (!Array.isArray(d.staff)) d.staff = [];
