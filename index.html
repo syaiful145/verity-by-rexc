@@ -435,6 +435,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 .staff-modal-detail{color:var(--mute);margin:.4rem 0 0}
 .staff-modal-close{position:absolute;z-index:2;right:.65rem;top:.65rem;width:2.3rem;height:2.3rem;border:1px solid var(--line);background:rgba(0,0,0,.7);color:var(--bone);font-size:1.5rem;cursor:pointer}
 .player-region{display:block;color:var(--mute);font-size:.76rem;margin-top:.18rem}
+  .country-flag{display:inline-block;width:1.35em;height:.9em;object-fit:contain;vertical-align:-.08em;border:1px solid rgba(255,255,255,.16);border-radius:2px;box-shadow:none;background:transparent}
 @media(max-width:600px){.staff-row{grid-template-columns:1fr auto;gap:.3rem .7rem}.staff-role{grid-column:1}.staff-more{grid-column:2;grid-row:1/3}}
 
 </style>
@@ -696,8 +697,8 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
       '<div class="pinfo"><h5>' + esc(p[1]) + '</h5>' + (p[2] ? '<span class="pn">' + esc(p[2]) + '</span>' : '') + country + (p[3] ? '<span class="pr">' + esc(p[3]) + '</span>' : '') + '</div></article>';
   }
   function regionFlag(code) {
-    code = String(code || "").toUpperCase();
-    return /^[A-Z]{2}$/.test(code) ? String.fromCodePoint(127397 + code.charCodeAt(0), 127397 + code.charCodeAt(1)) : "";
+    code = String(code || "").trim().toLowerCase();
+    return /^[a-z]{2}$/.test(code) ? '<img class="country-flag" src="https://flagcdn.com/' + code + '.svg" alt="Bendera ' + code.toUpperCase() + '" loading="lazy" decoding="async">' : "";
   }
   function regionCountryName(code) {
     code = String(code || "").trim().toUpperCase();
