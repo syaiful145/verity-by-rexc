@@ -60,7 +60,12 @@ export default async function handler(req, res) {
     });
 
     return sendJson(res, 200, { ok: true, url: blob.url });
-  } catch {
+  } catch (error) {
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    const errorMessage = error instanceof Error
+      ? error.message.replace(/Bearer\s+[^\s]+/gi, "Bearer [REDACTED]").replace(/([?&](?:token|key|secret)=)[^&\s]+/gi, "$1[REDACTED]")
+      : "Unknown upload error";
+    console.error("[upload-image] Blob upload failed:", errorName, errorMessage);
     return sendJson(res, 500, { error: "Foto gagal diunggah ke penyimpanan." });
   }
 }
