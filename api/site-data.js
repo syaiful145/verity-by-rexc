@@ -27,7 +27,7 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       const sql = getDb();
-      const rows = await sql`SELECT data FROM verity_site_state WHERE id = 1`;
+      const rows = await sql`SELECT data FROM verity_site_state WHERE id = '1'`;
       return sendJson(res, 200, { data: rows[0]?.data ?? null });
     } catch (error) {
       logDatabaseError("GET", error);
@@ -49,11 +49,11 @@ export default async function handler(req, res) {
       }
 
       const sql = getDb();
-      const previousRows = await sql`SELECT data FROM verity_site_state WHERE id = 1`;
+      const previousRows = await sql`SELECT data FROM verity_site_state WHERE id = '1'`;
       const previousData = previousRows[0]?.data ?? null;
 
       await sql`INSERT INTO verity_site_state (id, data, updated_at)
-        VALUES (1, ${JSON.stringify(data)}::jsonb, NOW())
+        VALUES ('1', ${JSON.stringify(data)}::jsonb, NOW())
         ON CONFLICT (id) DO UPDATE
         SET data = EXCLUDED.data, updated_at = NOW()`;
 
