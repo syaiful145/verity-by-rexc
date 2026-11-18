@@ -485,6 +485,62 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   .staff-role,
   .staff-detail-role{font-size:.82rem;line-height:1.4;letter-spacing:normal}
 }
+
+/* SISTEM TIPOGRAFI GLOBAL — satu skala untuk seluruh halaman */
+:root{
+  --type-display:clamp(3.1rem,8vw,8.5rem);
+  --type-section:clamp(2rem,4.5vw,3rem);
+  --type-card-title:1.25rem;
+  --type-subtitle:1.05rem;
+  --type-body:.95rem;
+  --type-meta:.85rem;
+  --type-label:.78rem;
+  --type-micro:.75rem;
+}
+body{font-size:.98rem;line-height:1.6}
+.hero h1{font-size:var(--type-display)}
+.head h2{font-size:var(--type-section)}
+.brand{font-size:1.3rem}
+.versus .team{font-size:1.6rem}
+.versus .score{font-size:2.6rem}
+.strip strong{font-size:2.4rem}
+.quick strong{font-size:1.4rem}
+.dhead .no,.dhead .nm{font-size:clamp(1rem,2.2vw,1.5rem)}
+.dbtn .no{font-size:.9rem}
+.dbtn .nm{font-size:1.15rem}
+.ptop h3{font-size:clamp(2.2rem,4vw,3rem)}
+.cblock h3{font-size:2rem}
+.news h3{font-size:1.4rem}
+.news.big h3{font-size:2.2rem}
+.ltitle{font-size:1.5rem}
+.rgh h4{font-size:1.5rem}
+.tmh h5{font-size:1.05rem}
+.tl h3{font-size:1.5rem}
+.staff-name,.staff-detail-copy h5,.pinfo h5{font-size:var(--type-card-title)}
+.hero .lead,.quick span,.news p,.lpane p,.strip .msg span,.staff-detail-text{font-size:var(--type-body)}
+.pinfo .pn,.pinfo .pr,.pinfo .player-region,.staff-role,.staff-detail-role,
+.dhead .gm,.mrow .meta,.rhead span,.td.handle small,.td.muted,td.muted,
+.pillars span,.bfoot,footer,.news time,.facts dd,.info strong,.tl .yr,
+.rgh span,.tmh span{font-size:var(--type-meta);line-height:1.45}
+.nav ul a,.btn,.more,.filter,.lout,.abtn,.live-pill,.bhead,
+.facts dt,.pstats span,.rhead h4,th,.tag,.news .cat,.info span,
+.lpane label,.alabel,.acard label,.tx label,.staff-more,.pimg .ptag,
+.strip span,#intro .istart p,.ptop .game{font-size:var(--type-label)}
+.menu-btn{font-size:var(--type-label)}
+.lpane input,.aform input,.aform select,#aDiv,.alabel select{font-size:var(--type-body)}
+td.handle{font-size:1.1rem}
+.pstats strong{font-size:1.6rem}
+.bars div{font-size:var(--type-meta)}
+@media(max-width:600px){
+  :root{--type-card-title:1.05rem;--type-subtitle:1rem;--type-body:.9rem;--type-meta:.82rem;--type-label:.75rem}
+  .hero h1{font-size:3.1rem}
+  .btn{font-size:.85rem}
+  .strip strong{font-size:1.8rem}
+  .versus .team{font-size:1.2rem}
+  .versus .score{font-size:2rem}
+  .staff-name,.staff-detail-copy h5,.pinfo h5{font-size:var(--type-card-title)}
+  .news.big h3{font-size:1.7rem}
+}
 </style>
 </head>
 <body class="intro-on">
