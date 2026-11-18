@@ -668,8 +668,9 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   var SIL = '<svg viewBox="0 0 120 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><circle cx="60" cy="52" r="23" fill="#2b2b33" stroke="rgba(255,255,255,.16)" stroke-width="1.5"/><path d="M12 150c2-34 20-52 48-52s46 18 48 52z" fill="#26262d" stroke="rgba(255,255,255,.16)" stroke-width="1.5"/><path d="M60 98l-12 14 12 38 12-38z" fill="#1b1b20"/></svg>';
   function playerCard(p) {
     var tag = p[4] ? '<span class="ptag">' + esc(p[4]) + '</span>' : "";
+    var flag = regionFlag(p[6]) ? '<span class="player-country" title="' + esc(regionCountryName(p[6]) || p[6]) + '">' + regionFlag(p[6]) + '</span> ' : "";
     return '<article class="pc"><div class="pimg">' + (p[5] ? '<img src="' + p[5] + '" alt="' + esc(p[1]) + '">' : SIL) + tag + '</div>' +
-      '<div class="pinfo"><h5>' + esc(p[1]) + '</h5>' + (p[2] ? '<span class="pn">' + esc(p[2]) + '</span>' : '') + (p[3] ? '<span class="pr">' + esc(p[3]) + '</span>' : '') + '</div></article>';
+      '<div class="pinfo"><h5>' + flag + esc(p[1]) + '</h5>' + (p[2] ? '<span class="pn">' + esc(p[2]) + '</span>' : '') + (p[3] ? '<span class="pr">' + esc(p[3]) + '</span>' : '') + '</div></article>';
   }
   function regionFlag(code) {
     code = String(code || "").toUpperCase();
@@ -725,7 +726,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     dacc.innerHTML = S.divisions.map(function (d, i) {
       var facts = d.facts.filter(function (f) { return !/^(pelatih|coach|manager|manajer)$/i.test(f[0]); }).map(function (f) { return '<div><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></div>'; }).join("");
       return '<div class="dit' + (i === openDiv ? " open" : "") + '" data-i="' + i + '">' +
-        '<button class="dhead" type="button" aria-expanded="' + (i === openDiv) + '"><span class="no">' + String(i + 1).padStart(2, "0") + '</span><span class="nm">' + esc(d.name) + '</span><span class="gm">' + esc(d.game) + '</span><i class="chev"></i></button>' +
+        '<button class="dhead" type="button" aria-expanded="' + (i === openDiv) + '"><span class="no">' + String(i + 1).padStart(2, "0") + '</span><span class="nm">' + (regionFlag(d.code) ? regionFlag(d.code) + ' ' : '') + esc(d.name) + '</span><span class="gm">' + esc(d.game) + '</span><i class="chev"></i></button>' +
         '<div class="dbody"><div class="dinner"><div class="dpad">' + (d.img ? '<img class="dimg" src="' + d.img + '" alt="">' : "") +
         '<div class="ptop"><div><p class="game">' + esc(d.game) + '</p><p>' + esc(d.desc) + '</p></div><dl class="facts">' + facts + '</dl></div>' +
         staffHtml(d, i) + regionsHtml(d) + '</div></div></div></div>';
