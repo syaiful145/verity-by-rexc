@@ -638,22 +638,22 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
       stats: [], regions: [{ name: "Indonesia", teams: [{ name: "Senior", roster: d.roster }] }] });
   });
   function migrate(d) {
-    if (!Array.isArray(d.regions) || !d.regions.length) {
-      var oldRoster = d.roster || [];
-      d.regions = [{ name: "Indonesia", code: "ID", roster: oldRoster, teams: [{ name: "Senior", roster: oldRoster }] }];
-    }
-    d.regions = d.regions.map(function (rg) {
+    var sourceRegions = Array.isArray(d.regions) && d.regions.length ? d.regions : [{ name: "Indonesia", code: "ID", roster: d.roster || [], teams: [] }];
+    var divisionCode = String(d.code || (sourceRegions[0] && sourceRegions[0].code) || "ID").toUpperCase();
+    var allRoster = [];
+    sourceRegions.forEach(function (rg) {
       var legacyTeams = Array.isArray(rg.teams) ? rg.teams : [];
       var roster = Array.isArray(rg.roster) ? rg.roster : legacyTeams.reduce(function (all, t) { return all.concat(t.roster || []); }, []);
-      roster = roster.map(function (p) {
-        if (!Array.isArray(p)) return p;
+      roster.forEach(function (p) {
+        if (!Array.isArray(p)) return;
         var position = String(p[3] || ""), role = String(p[4] || "");
         if (role === "lead") { role = "Kapten"; position = position.replace(/^Kapten\s*[·-]\s*/i, ""); }
         else if (role === "sub") role = "Cadangan";
-        return [p[0], p[1], p[2], position, role, p[5] || ""];
+        allRoster.push([p[0], p[1], p[2], position, role, p[5] || "", String(p[6] || rg.code || divisionCode).toUpperCase()]);
       });
-      return { name: rg.name || "Indonesia", code: rg.code || (rg.name === "Indonesia" ? "ID" : ""), roster: roster, teams: legacyTeams };
     });
+    d.code = divisionCode;
+    d.regions = [{ name: regionCountryName(divisionCode) || "Indonesia", code: divisionCode, roster: allRoster, teams: [] }];
     if (!Array.isArray(d.staff)) {
       d.staff = (d.facts || []).filter(function (f) { return /^(pelatih|coach|manager|manajer)$/i.test(f[0]) && String(f[1] || "").trim(); }).map(function (f) {
         return { name: String(f[1]).trim(), role: /^(pelatih|coach)$/i.test(f[0]) ? "Coach" : "Manager", detail: "", img: "" };
