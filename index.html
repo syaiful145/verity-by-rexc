@@ -443,6 +443,8 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 .staff-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"name role more";gap:.45rem 1rem;align-items:center;text-align:left;background:var(--ink-3);border:1px solid var(--line);padding:.9rem 1rem;color:var(--bone);cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
 .staff-row:hover{background:var(--ink-2);border-color:var(--gold);transform:translateY(-2px)}
 .staff-name{grid-area:name;font-family:var(--hud);font-size:1.25rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.staff-name{display:flex;align-items:center;gap:.35rem;line-height:1.2}
+.staff-name .country-flag{align-self:center;position:relative;top:-.04em}
 .staff-role{grid-area:role;display:block;width:max-content;max-width:100%;justify-self:center;align-self:center;text-align:center;color:var(--mute);font-family:var(--hud);font-size:.82rem;font-weight:400;letter-spacing:normal;text-transform:none}
 .staff-more{grid-area:more;justify-self:end;color:var(--gold);font-family:var(--hud);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
 .staff-detail-slot{display:grid;grid-template-rows:0fr;width:100%;min-width:0;opacity:0;overflow:hidden;transition:grid-template-rows .48s cubic-bezier(.22,.7,.2,1),opacity .3s ease;margin:0}
