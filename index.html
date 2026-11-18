@@ -688,7 +688,7 @@ td.handle{font-size:1.1rem}
  animation:staffModalFade .2s ease both;overflow-y:auto
 }
 .staff-detail-modal .staff-detail-card{
- flex:0 0 auto;width:calc((min(100vw,1200px) - 5rem)/4);max-width:260px;min-width:0;
+ flex:0 0 auto;width:calc((min(100vw,1200px) - 6.2rem)/4);max-width:none;min-width:0;
  max-height:calc(100dvh - 2rem);overflow:auto;
  border:1px solid var(--line);box-shadow:0 22px 70px rgba(0,0,0,.55);
  animation:staffCardPop .24s cubic-bezier(.2,.75,.25,1) both
@@ -701,8 +701,8 @@ td.handle{font-size:1.1rem}
 }
 .staff-detail-modal .staff-detail-photo{aspect-ratio:4/5}
 .staff-detail-modal .staff-detail-copy{padding:.2rem .9rem 1rem;margin-top:-1.1rem}
-@media(max-width:899px){.staff-detail-modal .staff-detail-card{width:calc((min(100vw,900px) - 4rem)/3)}}
-@media(max-width:599px){.staff-detail-modal .staff-detail-card{width:calc((100vw - 2.7rem)/2);max-width:220px}}
+@media(min-width:600px) and (max-width:899px){.staff-detail-modal .staff-detail-card{width:calc((min(100vw,900px) - 5.2rem)/3)}}
+@media(max-width:599px){.staff-detail-modal .staff-detail-card{width:calc((100vw - 3.7rem)/2);max-width:none}}
 @media(max-width:600px){.staff-detail-modal .staff-detail-copy{padding:.2rem .5rem .8rem}.staff-detail-modal .staff-detail-copy h5{font-size:1.05rem}}
 @keyframes staffModalFade{from{opacity:0}to{opacity:1}}
 @keyframes staffCardPop{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
