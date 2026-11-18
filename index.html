@@ -121,7 +121,7 @@ button{font:inherit;color:inherit}
 @media (max-width:600px){.pgrid{gap:.7rem}.pgrid .pc{flex-basis:calc((100% - .7rem) / 2)}.pinfo{padding:.2rem .5rem .8rem}.pinfo h5{font-size:1.05rem;overflow-wrap:anywhere}.pinfo .pn{font-size:.75rem}.pinfo .pr{font-size:.62rem;letter-spacing:.08em}}
 .pc{background:var(--ink-3);border:1px solid var(--line);overflow:hidden}
 
-.pimg{position:relative;aspect-ratio:4/5;background:radial-gradient(ellipse at 50% 18%,rgba(255,255,255,.07),transparent 62%),linear-gradient(#1d1d23,#101013);overflow:hidden}
+.pimg{position:relative;aspect-ratio:4/5;background:radial-gradient(ellipse at 50% 18%,rgba(255,196,0,.22),transparent 62%),linear-gradient(#1d1d23,#101013);overflow:hidden}
 .pimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block}
 .pimg svg{position:absolute;inset:0;width:100%;height:100%}
 .pimg::after{content:"";position:absolute;left:0;right:0;bottom:0;height:38%;background:linear-gradient(transparent,var(--ink-3))}
@@ -600,7 +600,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     <div class="head"><h2>Dashboard <span>admin</span></h2><p>Perubahan tersimpan di perangkat ini.</p></div>
     <div class="atabs" role="tablist" id="atabs">
       <button class="atab on" data-a="div" type="button">Divisi</button>
-      <button class="atab" data-a="ros" type="button">Roster &amp; Region</button>
+      <button class="atab" data-a="ros" type="button">Roster</button>
       <button class="atab" data-a="staff" type="button">Manajemen</button>
       <button class="atab" data-a="his" type="button">Sejarah</button>
       <button class="atab" data-a="txt" type="button">Teks &amp; foto utama</button>
@@ -665,7 +665,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 
   /* ---------- Divisi (daftar ke bawah, terbuka saat dipilih) ---------- */
   var dacc = document.getElementById("dacc"), openDiv = -1;
-  var SIL = '<svg viewBox="0 0 120 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><circle cx="60" cy="52" r="23" fill="#2b2b33" stroke="rgba(255,255,255,.16)" stroke-width="1.5"/><path d="M12 150c2-34 20-52 48-52s46 18 48 52z" fill="#26262d" stroke="rgba(255,196,0,.35)" stroke-width="1.5"/><path d="M60 98l-12 14 12 38 12-38z" fill="#1b1b20"/></svg>';
+  var SIL = '<svg viewBox="0 0 120 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><circle cx="60" cy="52" r="23" fill="#2b2b33" stroke="rgba(255,255,255,.16)" stroke-width="1.5"/><path d="M12 150c2-34 20-52 48-52s46 18 48 52z" fill="#26262d" stroke="rgba(255,255,255,.16)" stroke-width="1.5"/><path d="M60 98l-12 14 12 38 12-38z" fill="#1b1b20"/></svg>';
   function playerCard(p) {
     var tag = p[4] ? '<span class="ptag">' + esc(p[4]) + '</span>' : "";
     return '<article class="pc"><div class="pimg">' + (p[5] ? '<img src="' + p[5] + '" alt="' + esc(p[1]) + '">' : SIL) + tag + '</div>' +
