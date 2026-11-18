@@ -625,6 +625,30 @@ td.handle{font-size:1.1rem}
 .division-facts dd{display:flex;align-items:center;gap:.4rem;margin:0;color:var(--bone);font-family:var(--hud);font-size:.95rem;font-weight:800}
 .division-facts .country-flag{width:1.3rem!important;min-width:1.3rem!important;height:.86rem!important;min-height:.86rem!important}
 .division-logo{display:flex;align-items:center;justify-content:center;min-width:0;min-height:155px}
+/* Grid animasi Verity seperti latar intro dan beranda, khusus area logo divisi */
+.division-logo{position:relative;isolation:isolate;overflow:hidden}
+.division-logo::before{
+ content:"";position:absolute;z-index:-1;inset:-35%;
+ background-image:
+  linear-gradient(rgba(255,196,0,.13) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,196,0,.13) 1px,transparent 1px);
+ background-size:28px 28px;
+ -webkit-mask-image:radial-gradient(ellipse at center,#000 18%,transparent 76%);
+ mask-image:radial-gradient(ellipse at center,#000 18%,transparent 76%);
+ opacity:.72;animation:divisionGridDrift 18s linear infinite;
+ pointer-events:none
+}
+.division-logo::after{
+ content:"";position:absolute;z-index:-1;inset:0;
+ background:radial-gradient(ellipse at center,rgba(255,196,0,.13),transparent 68%);
+ pointer-events:none
+}
+.division-logo img,.division-logo-mark{position:relative;z-index:1}
+@keyframes divisionGridDrift{
+ from{background-position:0 0,0 0}
+ to{background-position:56px 56px,56px 56px}
+}
+@media(prefers-reduced-motion:reduce){.division-logo::before{animation:none}}
 .division-logo img{display:block;width:min(100%,270px);height:175px;object-fit:contain;filter:drop-shadow(0 12px 24px rgba(255,196,0,.12))}
 .division-logo-mark{display:grid;place-items:center;width:clamp(100px,14vw,170px);aspect-ratio:1;border:1px solid rgba(255,196,0,.35);border-radius:50%;color:var(--gold);font-family:var(--hud);font-size:clamp(4rem,9vw,7rem);font-weight:900;text-shadow:0 0 24px rgba(255,196,0,.25);background:radial-gradient(circle,rgba(255,196,0,.1),transparent 68%)}
 .roster-section{margin-top:0}
