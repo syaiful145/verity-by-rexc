@@ -104,8 +104,9 @@ button{font:inherit;color:inherit}
 .dit+.dit{border-top:1px solid var(--line)}
 .dhead{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:1.2rem;padding:1.3rem 1.6rem;cursor:pointer}
 .dhead:hover,.dhead:focus-visible{background:var(--ink-3)}
-.dhead .no{font-family:var(--hud);color:var(--gold)}
-.dhead .nm{font-family:var(--hud);font-size:1.5rem;text-transform:uppercase;letter-spacing:.04em}
+.dhead .no,.dhead .nm{font-family:var(--hud);font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;line-height:1.15;text-transform:uppercase;letter-spacing:.04em}
+.dhead .no{color:var(--gold);flex:none}
+.dhead .nm{min-width:0}
 .dhead .gm{margin-left:auto;color:var(--mute);font-size:.85rem}
 .dhead .chev{width:12px;height:12px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);transition:transform .45s ease;margin:-4px 4px 0 .6rem;flex:none}
 .dit.open .chev{transform:rotate(-135deg);margin-top:4px}
@@ -438,6 +439,11 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 @media (max-width:600px){.staff-detail-card{flex-basis:calc((100% - .7rem)/2)}.staff-detail-copy{padding:.2rem .5rem .8rem}.staff-detail-copy h5{font-size:1.05rem}.staff-detail-role{font-size:.75rem}}
 .player-region{display:block;color:var(--mute);font-size:.76rem;margin-top:.18rem}
   .country-flag{display:inline-block;width:auto;height:.9em;max-width:1.7em;object-fit:fill;vertical-align:-.08em;border:0;border-radius:0;box-shadow:none;background:transparent}
+  .public-game-group+.public-game-group{margin-top:2rem}
+  .public-game-title{font-family:var(--hud);font-size:clamp(1.1rem,2.4vw,1.55rem);font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:0;padding:1rem 1.4rem;border-bottom:1px solid var(--line);background:var(--ink-3)}
+  .dhead{gap:clamp(.55rem,2vw,1.2rem);padding:clamp(.9rem,2vw,1.3rem) clamp(.85rem,3vw,1.6rem)}
+  .dhead .gm{font-size:clamp(.68rem,1.5vw,.85rem);text-align:right}
+  @media(max-width:520px){.dhead .gm{display:none}.public-game-title{padding:.85rem 1rem}}
 @media(max-width:600px){.staff-row{grid-template-columns:1fr auto;gap:.3rem .7rem}.staff-role{grid-column:1}.staff-more{grid-column:2;grid-row:1/3}}
 
 </style>
@@ -626,6 +632,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     <div class="head"><h2>Dashboard <span>admin</span></h2><p>Perubahan tersimpan di perangkat ini.</p></div>
     <div class="atabs" role="tablist" id="atabs">
       <button class="atab on" data-a="div" type="button">Divisi</button>
+      <button class="atab" data-a="games" type="button">Game</button>
       <button class="atab" data-a="ros" type="button">Roster</button>
       <button class="atab" data-a="staff" type="button">Manajemen</button>
       <button class="atab" data-a="his" type="button">Sejarah</button>
@@ -657,12 +664,31 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
 
   /* ---------- State ---------- */
-  var S = { divisions: [], history: [{ year: "2026", title: "Verity by Rexc berdiri", text: "Tulis awal mula tim di sini.", img: "" }], texts: {}, hero: "" };
+  var S = { games: [], divisions: [], history: [{ year: "2026", title: "Verity by Rexc berdiri", text: "Tulis awal mula tim di sini.", img: "" }], texts: {}, hero: "" };
   Object.keys(divisions).forEach(function (k) {
     var d = divisions[k];
     S.divisions.push({ id: k, name: d.name, game: d.game, desc: d.desc, img: "", facts: d.facts,
       stats: [], regions: [{ name: "Indonesia", teams: [{ name: "Senior", roster: d.roster }] }] });
   });
+  function gameKey(name) {
+    return "game-" + String(name || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+  function ensureGames() {
+    if (!Array.isArray(S.games)) S.games = [];
+    S.games = S.games.filter(function (g) { return g && g.id && String(g.name || "").trim(); });
+    S.divisions.forEach(function (d) {
+      var gameName = String(d.game || "").trim();
+      var game = S.games.find(function (g) { return g.id === d.gameId; }) ||
+        S.games.find(function (g) { return String(g.name).toLowerCase() === gameName.toLowerCase(); });
+      if (!game && gameName) {
+        var id = gameKey(gameName), base = id, n = 2;
+        while (S.games.some(function (g) { return g.id === id; })) id = base + "-" + n++;
+        game = { id: id, name: gameName };
+        S.games.push(game);
+      }
+      if (game) { d.gameId = game.id; d.game = game.name; }
+    });
+  }
   function migrate(d) {
     var sourceRegions = Array.isArray(d.regions) && d.regions.length ? d.regions : [{ name: "Indonesia", code: "ID", roster: d.roster || [], teams: [] }];
     var divisionCode = String(d.code || (sourceRegions[0] && sourceRegions[0].code) || "ID").toUpperCase();
@@ -679,6 +705,8 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
       });
     });
     d.code = divisionCode;
+    d.game = String(d.game || "").trim();
+    d.gameId = String(d.gameId || "");
     d.regions = [{ name: regionCountryName(divisionCode) || "Indonesia", code: divisionCode, roster: allRoster, teams: [] }];
     if (!Array.isArray(d.staff)) {
       d.staff = (d.facts || []).filter(function (f) { return /^(pelatih|coach|manager|manajer)$/i.test(f[0]) && String(f[1] || "").trim(); }).map(function (f) {
@@ -745,14 +773,21 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     setTimeout(function () { if (slot.parentNode && !slot.classList.contains("open")) slot.remove(); }, 560);
   }
   function renderDivList() {
-    dacc.innerHTML = S.divisions.map(function (d, i) {
+    ensureGames();
+    var divisionMarkup = S.games.map(function (game) {
+      var entries = S.divisions.map(function (d, i) { return { division: d, index: i }; }).filter(function (entry) { return entry.division.gameId === game.id; });
+      if (!entries.length) return "";
+      return '<section class="public-game-group"><h3 class="public-game-title">' + esc(game.name) + '</h3>' + entries.map(function (entry) {
+      var d = entry.division, i = entry.index;
       var facts = d.facts.filter(function (f) { return !/^(pelatih|coach|manager|manajer)$/i.test(f[0]); }).map(function (f) { return '<div><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></div>'; }).join("");
       return '<div class="dit' + (i === openDiv ? " open" : "") + '" data-i="' + i + '">' +
         '<button class="dhead" type="button" aria-expanded="' + (i === openDiv) + '"><span class="no">' + String(i + 1).padStart(2, "0") + '</span><span class="nm">' + (regionFlag(d.code) ? regionFlag(d.code) + ' ' : '') + esc(d.name) + '</span><span class="gm">' + esc(d.game) + '</span><i class="chev"></i></button>' +
         '<div class="dbody"><div class="dinner"><div class="dpad">' + (d.img ? '<img class="dimg" src="' + d.img + '" alt="">' : "") +
-        '<div class="ptop"><div><p class="game">' + esc(d.game) + '</p><p>' + esc(d.desc) + '</p></div><dl class="facts">' + facts + '</dl></div>' +
+        '<div class="ptop"><div><p class="game">' + esc(game.name) + '</p><p>' + esc(d.desc) + '</p></div><dl class="facts">' + facts + '</dl></div>' +
         staffHtml(d, i) + regionsHtml(d) + '</div></div></div></div>';
-    }).join("") || '<p class="muted" style="padding:1.5rem">Belum ada divisi.</p>';
+    }).join("") + '</section>';
+    }).join("");
+    dacc.innerHTML = divisionMarkup || '<p class="muted" style="padding:1.5rem">Belum ada divisi.</p>';
     var c = document.getElementById("cntDiv"); if (c) c.textContent = String(S.divisions.length).padStart(2, "0");
   }
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeStaffDetail(); });
@@ -999,6 +1034,8 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   function applyData(d) {
     if (d && Array.isArray(d.divisions)) {
       S.divisions = d.divisions.map(migrate);
+      S.games = Array.isArray(d.games) ? d.games.slice() : [];
+      ensureGames();
       S.history = d.history || [];
       S.texts = d.texts || {};
       S.hero = d.hero || "";
@@ -1061,6 +1098,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   function adminMsg(t) { aMsg.textContent = t; }
   var saveTimer = null, saveVersion = 0;
   function persist() {
+    ensureGames();
     S.divisions.forEach(function (d) {
       d.code = String(d.code || "ID").toUpperCase();
       if (!Array.isArray(d.regions) || !d.regions.length) d.regions = [{ name: regionCountryName(d.code) || "Indonesia", code: d.code, roster: [], teams: [] }];
@@ -1113,18 +1151,31 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
       '<div><input type="file" accept="image/*" data-img="' + path + '"> ' + (val ? '<button class="abtn" type="button" data-clr="' + path + '">Hapus foto</button>' : "") + '</div>';
   }
   function renderAdmin() {
+    ensureGames();
     var h = "", i;
-    if (aTab === "div") {
+    if (aTab === "games") {
+      S.games.forEach(function (g, i) {
+        var linked = S.divisions.filter(function (d) { return d.gameId === g.id; }).length;
+        h += '<div class="acard"><div class="row">' + fld("games." + i + ".name", g.name, "Nama game") +
+          '<label>Jumlah divisi terkait<input value="' + linked + '" disabled></label></div>' +
+          '<div><button class="abtn" type="button" data-gdel="' + i + '"' + (linked ? ' disabled title="Pindahkan divisi terlebih dahulu"' : '') + '>Hapus game</button></div></div>';
+      });
+      h += '<form class="aform" id="gAdd"><input name="name" placeholder="Nama game baru" required><button class="btn" type="submit">Tambah game</button></form>';
+    } else if (aTab === "div") {
       S.divisions.forEach(function (d, i) {
         var p = "divisions." + i;
-        h += '<div class="acard"><div class="row">' + fld(p + ".name", d.name, "Nama divisi") + fld(p + ".game", d.game, "Game") + countryFld(p + ".code", d.code, "ID negara divisi") + '</div>' +
+        h += '<div class="acard"><div class="row">' + fld(p + ".name", d.name, "Nama divisi") +
+          '<label>Game<select data-game-select="' + i + '" required>' + S.games.map(function (g) { return '<option value="' + esc(g.id) + '"' + (g.id === d.gameId ? " selected" : "") + '>' + esc(g.name) + '</option>'; }).join("") + '</select></label>' +
+          countryFld(p + ".code", d.code, "ID negara divisi") + '</div>' +
           fld(p + ".desc", d.desc, "Deskripsi", true) +
           '<div class="row">' + d.facts.map(function (f, j) { return /^(pelatih|coach|manager|manajer)$/i.test(f[0]) ? "" : fld(p + ".facts." + j + ".1", f[1], f[0]); }).join("") +
           '</div>' +
           imgFld(p + ".img", d.img, "Foto divisi") +
           '<div><button class="abtn" type="button" data-ddel="' + i + '">Hapus divisi</button></div></div>';
       });
-      h += '<form class="aform" id="dAdd"><input name="name" placeholder="Nama divisi baru" required><input name="game" placeholder="Game" required><input name="code" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" placeholder="ID negara (contoh ID)" required><button class="btn" type="submit">Tambah divisi</button></form>';
+      h += '<form class="aform" id="dAdd"><input name="name" placeholder="Nama divisi baru" required><select name="gameId" required>' +
+        '<option value="">Pilih game</option>' + S.games.map(function (g) { return '<option value="' + esc(g.id) + '">' + esc(g.name) + '</option>'; }).join("") +
+        '</select><input name="code" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" placeholder="ID negara (contoh ID)" required><button class="btn" type="submit"' + (!S.games.length ? ' disabled' : '') + '>Tambah divisi</button></form>';
     } else if (aTab === "ros") {
       if (aSel >= S.divisions.length) aSel = 0;
       h += '<label class="alabel">Divisi <select id="aSel">' + S.divisions.map(function (d, i) { return '<option value="' + i + '"' + (i === aSel ? " selected" : "") + '>' + esc(d.name) + '</option>'; }).join("") + '</select></label>';
@@ -1179,6 +1230,12 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   });
   aBody.addEventListener("change", function (e) {
     if (e.target.id === "aSel") { aSel = +e.target.value; aReg = 0; renderAdmin(); return; }
+    if (e.target.hasAttribute("data-game-select")) {
+      var division = S.divisions[+e.target.getAttribute("data-game-select")];
+      var selectedGame = S.games.find(function (g) { return g.id === e.target.value; });
+      if (division && selectedGame) { division.gameId = selectedGame.id; division.game = selectedGame.name; persist(); renderAdmin(); }
+      return;
+    }
     if (e.target.id === "aReg") { aReg = +e.target.value; renderAdmin(); return; }
     var changedPath = e.target.getAttribute("data-path");
     if (changedPath && e.target.tagName === "SELECT") { setPath(changedPath, e.target.value); persist(); return; }
@@ -1228,6 +1285,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     var a = e.target, v;
     if ((v = a.getAttribute("data-clr")) !== null) { setPath(v, ""); persist(); renderAdmin(); }
     else if ((v = a.getAttribute("data-ddel")) !== null) { if (confirm("Hapus divisi ini beserta rosternya?")) { S.divisions.splice(+v, 1); persist(); renderAdmin(); } }
+    else if ((v = a.getAttribute("data-gdel")) !== null) { var game = S.games[+v]; if (game && !S.divisions.some(function (d) { return d.gameId === game.id; }) && confirm("Hapus game ini?")) { S.games.splice(+v, 1); persist(); renderAdmin(); } }
     else if ((v = a.getAttribute("data-rdel")) !== null) { S.divisions[aSel].regions[0].roster.splice(+v, 1); persist(); renderAdmin(); }
     else if ((v = a.getAttribute("data-sdel")) !== null) { S.divisions[aSel].staff.splice(+v, 1); persist(); renderAdmin(); }
     else if ((v = a.getAttribute("data-hdel")) !== null) { S.history.splice(+v, 1); persist(); renderAdmin(); }
@@ -1235,10 +1293,19 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   aBody.addEventListener("submit", function (e) {
     e.preventDefault();
     var f = e.target;
-    if (f.id === "dAdd") {
+    if (f.id === "gAdd") {
+      var gameName = f.name.value.trim();
+      if (S.games.some(function (g) { return g.name.toLowerCase() === gameName.toLowerCase(); })) { adminMsg("Game tersebut sudah ada."); return; }
+      var gameId = gameKey(gameName), baseId = gameId, suffix = 2;
+      while (S.games.some(function (g) { return g.id === gameId; })) gameId = baseId + "-" + suffix++;
+      S.games.push({ id: gameId, name: gameName });
+    }
+    else if (f.id === "dAdd") {
       var divisionCode = f.code.value.trim().toUpperCase();
+      var selectedGame = S.games.find(function (g) { return g.id === f.gameId.value; });
+      if (!selectedGame) { adminMsg("Pilih game terlebih dahulu."); return; }
       if (!regionCountryName(divisionCode)) { adminMsg("ID negara divisi tidak dikenali. Gunakan kode negara ISO 2 huruf."); return; }
-      S.divisions.push({ id: "d" + Date.now(), name: f.name.value.trim(), game: f.game.value.trim(), code: divisionCode, desc: "", img: "", facts: [["Pelatih", ""], ["Manajer", ""]], stats: [], staff: [], regions: [{ name: regionCountryName(divisionCode), code: divisionCode, roster: [], teams: [] }] });
+      S.divisions.push({ id: "d" + Date.now(), name: f.name.value.trim(), game: selectedGame.name, gameId: selectedGame.id, code: divisionCode, desc: "", img: "", facts: [["Pelatih", ""], ["Manajer", ""]], stats: [], staff: [], regions: [{ name: regionCountryName(divisionCode), code: divisionCode, roster: [], teams: [] }] });
     }
     else if (f.id === "rAdd") {
       var playerCode = f.code.value.trim().toUpperCase();
