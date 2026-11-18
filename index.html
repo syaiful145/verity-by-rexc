@@ -638,10 +638,14 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
       stats: [], regions: [{ name: "Indonesia", teams: [{ name: "Senior", roster: d.roster }] }] });
   });
   function migrate(d) {
-    if (!Array.isArray(d.regions) || !d.regions.length) d.regions = [{ name: "Indonesia", code: "ID", roster: d.roster || [] }];
+    if (!Array.isArray(d.regions) || !d.regions.length) {
+      var oldRoster = d.roster || [];
+      d.regions = [{ name: "Indonesia", code: "ID", roster: oldRoster, teams: [{ name: "Senior", roster: oldRoster }] }];
+    }
     d.regions = d.regions.map(function (rg) {
-      var roster = Array.isArray(rg.roster) ? rg.roster : (Array.isArray(rg.teams) ? rg.teams.reduce(function (all, t) { return all.concat(t.roster || []); }, []) : []);
-      return { name: rg.name || "Indonesia", code: rg.code || (rg.name === "Indonesia" ? "ID" : ""), roster: roster };
+      var legacyTeams = Array.isArray(rg.teams) ? rg.teams : [];
+      var roster = Array.isArray(rg.roster) ? rg.roster : legacyTeams.reduce(function (all, t) { return all.concat(t.roster || []); }, []);
+      return { name: rg.name || "Indonesia", code: rg.code || (rg.name === "Indonesia" ? "ID" : ""), roster: roster, teams: legacyTeams };
     });
     if (!Array.isArray(d.staff)) d.staff = [];
     delete d.roster;
@@ -985,7 +989,12 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   function adminMsg(t) { aMsg.textContent = t; }
   var saveTimer = null, saveVersion = 0;
   function persist() {
-    S.divisions.forEach(function (d) { d.regions.forEach(function (g) { g.teams.forEach(function (t) { t.roster.forEach(function (p, i) { p[0] = String(i + 1).padStart(2, "0"); }); }); }); });
+    S.divisions.forEach(function (d) {
+      d.regions.forEach(function (g) {
+        g.roster.forEach(function (p, i) { p[0] = String(i + 1).padStart(2, "0"); });
+        g.teams = [{ name: "Senior", roster: g.roster }];
+      });
+    });
     renderAll();
     adminMsg("Sedang menyimpan...");
     var version = ++saveVersion;
