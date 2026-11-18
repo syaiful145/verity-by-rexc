@@ -421,20 +421,17 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 .staff-name{font-family:var(--hud);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
 .staff-role{color:var(--mute);font-size:.9rem}
 .staff-more{color:var(--gold);font-family:var(--hud);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
-.staff-modal{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:1.2rem;background:rgba(0,0,0,.82);opacity:0;visibility:hidden;transition:opacity .28s ease,visibility .28s ease}
-.staff-modal[hidden]{display:none}
-.staff-modal.open{opacity:1;visibility:visible}
-@keyframes staffDropCenter{0%{transform:translateY(-68vh) scale(.94);opacity:.7}72%{transform:translateY(12px) scale(1.015);opacity:1}100%{transform:translateY(0) scale(1)}}
-.staff-modal-card{position:relative;width:min(340px,88vw);max-height:90vh;overflow:auto;background:var(--ink-3);border:1px solid var(--line);box-shadow:0 20px 80px rgba(0,0,0,.65);transform:translateY(-68vh) scale(.94);opacity:.7}
-.staff-modal.open .staff-modal-card{animation:staffDropCenter .62s cubic-bezier(.2,.8,.2,1) both}
-.staff-modal-photo{width:100%;aspect-ratio:4/5;max-height:58vh;background:radial-gradient(ellipse at 50% 18%,rgba(255,196,0,.22),transparent 62%),linear-gradient(#1d1d23,#101013);display:flex;align-items:stretch;justify-content:center;overflow:hidden}
-.staff-modal-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom}
-.staff-modal-photo svg{width:100%;height:100%}
-.staff-modal-copy{padding:.2rem .9rem 1rem;text-align:center;position:relative;z-index:2;margin-top:-.4rem}
-.staff-modal-copy h3{font-family:var(--hud);font-size:1.3rem;text-transform:uppercase;margin:0}
-.staff-modal-role{color:var(--gold);font-family:var(--hud);text-transform:uppercase;letter-spacing:.1em;margin:.35rem 0}
-.staff-modal-detail{color:var(--mute);margin:.4rem 0 0}
-.staff-modal-close{position:absolute;z-index:2;right:.65rem;top:.65rem;width:2.3rem;height:2.3rem;border:1px solid var(--line);background:rgba(0,0,0,.7);color:var(--bone);font-size:1.5rem;cursor:pointer}
+.staff-detail-slot{display:flex;justify-content:center;overflow:hidden;max-height:0;opacity:0;transform:translateY(-18px);transition:max-height .55s ease,opacity .35s ease,transform .55s cubic-bezier(.2,.8,.2,1);margin:0}
+.staff-detail-slot.open{max-height:1000px;opacity:1;transform:translateY(0);margin:.9rem 0 1.2rem}
+.staff-detail-card{position:relative;width:min(340px,88vw);background:var(--ink-3);border:1px solid var(--line);overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.35)}
+.staff-detail-photo{width:100%;aspect-ratio:4/5;max-height:58vh;background:radial-gradient(ellipse at 50% 18%,rgba(255,196,0,.22),transparent 62%),linear-gradient(#1d1d23,#101013);display:flex;align-items:stretch;justify-content:center;overflow:hidden}
+.staff-detail-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom}
+.staff-detail-photo svg{width:100%;height:100%}
+.staff-detail-copy{padding:.2rem .9rem 1rem;text-align:center;position:relative;z-index:2;margin-top:-.4rem}
+.staff-detail-copy h3{font-family:var(--hud);font-size:1.3rem;text-transform:uppercase;margin:0}
+.staff-detail-role{color:var(--gold);font-family:var(--hud);text-transform:uppercase;letter-spacing:.1em;margin:.35rem 0}
+.staff-detail-text{color:var(--mute);margin:.4rem 0 0}
+.staff-detail-close{margin:.7rem auto 0;display:block;background:none;border:1px solid var(--line);color:var(--mute);padding:.35rem .8rem;cursor:pointer}
 .player-region{display:block;color:var(--mute);font-size:.76rem;margin-top:.18rem}
   .country-flag{display:inline-block;width:auto;height:.9em;max-width:1.7em;object-fit:fill;vertical-align:-.08em;border:0;border-radius:0;box-shadow:none;background:transparent}
 @media(max-width:600px){.staff-row{grid-template-columns:1fr auto;gap:.3rem .7rem}.staff-role{grid-column:1}.staff-more{grid-column:2;grid-row:1/3}}
@@ -722,30 +719,27 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
       return '<button class="staff-row" type="button" data-staff-detail="' + i + '" data-staff-division="' + divisionIndex + '"><span class="staff-name">' + esc(p.name) + '</span><span class="staff-role">' + esc(p.role) + '</span><span class="staff-more">Lihat detail</span></button>';
     }).join("") + '</div></section>';
   }
-  function showStaffDetail(divisionIndex, staffIndex) {
+  function showStaffDetail(divisionIndex, staffIndex, staffButton) {
     var d = S.divisions[divisionIndex], p = d && d.staff && d.staff[staffIndex];
-    if (!p) return;
-    var modal = document.getElementById("staffDetailModal");
-    if (!modal) {
-      modal = document.createElement("div");
-      modal.id = "staffDetailModal"; modal.className = "staff-modal";
-      modal.innerHTML = '<div class="staff-modal-card" role="dialog" aria-modal="true" aria-labelledby="staffModalName"><button class="staff-modal-close" type="button" aria-label="Tutup">×</button><div class="staff-modal-photo"></div><div class="staff-modal-copy"><h3 id="staffModalName"></h3><p class="staff-modal-role"></p><p class="staff-modal-detail"></p></div></div>';
-      document.body.appendChild(modal);
-      modal.addEventListener("click", function (ev) { if (ev.target === modal || ev.target.closest(".staff-modal-close")) closeStaffDetail(); });
-    }
-    modal.querySelector(".staff-modal-photo").innerHTML = p.img ? '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '">' : SIL;
-    modal.querySelector("#staffModalName").textContent = p.name || "";
-    modal.querySelector(".staff-modal-role").textContent = p.role || "";
-    modal.querySelector(".staff-modal-detail").textContent = p.detail || "";
-    modal.hidden = false; modal.classList.remove("open");
-    requestAnimationFrame(function () { modal.classList.add("open"); });
-    document.body.style.overflow = "hidden";
+    if (!p || !staffButton) return;
+    var existing = document.querySelector(".staff-detail-slot");
+    if (existing && existing.previousElementSibling === staffButton) { closeStaffDetail(); return; }
+    if (existing) existing.remove();
+    var slot = document.createElement("div");
+    slot.className = "staff-detail-slot";
+    slot.innerHTML = '<article class="staff-detail-card"><div class="staff-detail-photo">' + (p.img ? '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '">' : SIL) + '</div><div class="staff-detail-copy"><h3>' + esc(p.name || "") + '</h3><p class="staff-detail-role">' + esc(p.role || "") + '</p><p class="staff-detail-text">' + esc(p.detail || "") + '</p><button class="staff-detail-close" type="button">Tutup detail</button></div></article>';
+    staffButton.insertAdjacentElement("afterend", slot);
+    requestAnimationFrame(function () {
+      slot.classList.add("open");
+      setTimeout(function () { slot.scrollIntoView({ behavior:"smooth", block:"center" }); }, 120);
+    });
+    slot.querySelector(".staff-detail-close").addEventListener("click", closeStaffDetail);
   }
   function closeStaffDetail() {
-    var modal = document.getElementById("staffDetailModal");
-    if (!modal) return;
-    modal.classList.remove("open"); document.body.style.overflow = "";
-    setTimeout(function () { if (!modal.classList.contains("open")) modal.hidden = true; }, 300);
+    var slot = document.querySelector(".staff-detail-slot");
+    if (!slot) return;
+    slot.classList.remove("open");
+    setTimeout(function () { if (slot.parentNode && !slot.classList.contains("open")) slot.remove(); }, 560);
   }
   function renderDivList() {
     dacc.innerHTML = S.divisions.map(function (d, i) {
@@ -761,7 +755,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeStaffDetail(); });
   dacc.addEventListener("click", function (e) {
     var staffButton = e.target.closest("[data-staff-detail]");
-    if (staffButton) { showStaffDetail(+staffButton.getAttribute("data-staff-division"), +staffButton.getAttribute("data-staff-detail")); return; }
+    if (staffButton) { showStaffDetail(+staffButton.getAttribute("data-staff-division"), +staffButton.getAttribute("data-staff-detail"), staffButton); return; }
     var b = e.target.closest(".dhead"); if (!b) return;
     var it = b.parentElement, i = +it.getAttribute("data-i"), was = it.classList.contains("open");
     dacc.querySelectorAll(".dit.open").forEach(function (x) { x.classList.remove("open"); x.firstChild.setAttribute("aria-expanded", "false"); });
