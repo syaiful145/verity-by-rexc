@@ -19,7 +19,7 @@ function collectBlobUrls(value, urls = new Set()) {
 
 function logDatabaseError(operation, error) {
   const message = String(error?.message || error || "Unknown database error")
-    .replace(/(postgres(?:ql)?:\\/\\/[^:]+:)[^@]+@/gi, "$1[redacted]@");
+    .replace(new RegExp("://[^:]+:[^@]+@", "gi"), "://[redacted]@");
   console.error(`[site-data] ${operation} failed:`, error?.name || "Error", message);
 }
 
