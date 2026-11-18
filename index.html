@@ -600,7 +600,8 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     <div class="head"><h2>Dashboard <span>admin</span></h2><p>Perubahan tersimpan di perangkat ini.</p></div>
     <div class="atabs" role="tablist" id="atabs">
       <button class="atab on" data-a="div" type="button">Divisi</button>
-      <button class="atab" data-a="ros" type="button">Roster</button>
+      <button class="atab" data-a="ros" type="button">Roster &amp; Region</button>
+      <button class="atab" data-a="staff" type="button">Manager &amp; Coach</button>
       <button class="atab" data-a="his" type="button">Sejarah</button>
       <button class="atab" data-a="txt" type="button">Teks &amp; foto utama</button>
     </div>
@@ -637,7 +638,13 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
       stats: [], regions: [{ name: "Indonesia", teams: [{ name: "Senior", roster: d.roster }] }] });
   });
   function migrate(d) {
-    if (!d.regions) { d.regions = [{ name: "Indonesia", teams: [{ name: "Senior", roster: d.roster || [] }] }]; delete d.roster; }
+    if (!Array.isArray(d.regions) || !d.regions.length) d.regions = [{ name: "Indonesia", code: "ID", roster: d.roster || [] }];
+    d.regions = d.regions.map(function (rg) {
+      var roster = Array.isArray(rg.roster) ? rg.roster : (Array.isArray(rg.teams) ? rg.teams.reduce(function (all, t) { return all.concat(t.roster || []); }, []) : []);
+      return { name: rg.name || "Indonesia", code: rg.code || (rg.name === "Indonesia" ? "ID" : ""), roster: roster };
+    });
+    if (!Array.isArray(d.staff)) d.staff = [];
+    delete d.roster;
     return d;
   }
 
@@ -651,11 +658,15 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   }
   function regionsHtml(d) {
     return d.regions.map(function (rg) {
-      return '<section class="reg"><div class="rgh"><h4>' + esc(rg.name) + '</h4></div>' +
-        rg.teams.map(function (t) {
-          return '<div class="tmh"><h5>' + esc(t.name) + '</h5><span>' + t.roster.length + ' pemain</span></div><div class="pgrid">' + t.roster.map(playerCard).join("") + '</div>';
-        }).join("") + '</section>';
+      var flag = rg.code ? '<img class="region-flag" src="https://flagcdn.com/w40/' + esc(rg.code.toLowerCase()) + '.png" alt="Bendera ' + esc(rg.name) + '">' : "";
+      return '<section class="reg"><div class="rgh">' + flag + '<h4>' + esc(rg.name) + '</h4></div><div class="tmh"><span>' + rg.roster.length + ' pemain</span></div><div class="pgrid">' + rg.roster.map(playerCard).join("") + '</div></section>';
     }).join("") || '<p class="muted">Belum ada region.</p>';
+  }
+  function staffHtml(d) {
+    if (!d.staff || !d.staff.length) return "";
+    return '<section class="reg staff-section"><div class="rgh"><h4>Manager &amp; Coach</h4></div><div class="pgrid">' + d.staff.map(function (p) {
+      return '<article class="pc"><div class="pimg">' + (p.img ? '<img src="' + p.img + '" alt="' + esc(p.name) + '">' : SIL) + '</div><div class="pinfo"><h5>' + esc(p.name) + '</h5><span class="pr">' + esc(p.role) + '</span><details><summary>Lihat detail</summary><span class="pn">' + esc(p.detail || p.name) + '</span></details></div></article>';
+    }).join("") + '</div></section>';
   }
   function renderDivList() {
     dacc.innerHTML = S.divisions.map(function (d, i) {
@@ -664,7 +675,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
         '<button class="dhead" type="button" aria-expanded="' + (i === openDiv) + '"><span class="no">' + String(i + 1).padStart(2, "0") + '</span><span class="nm">' + esc(d.name) + '</span><span class="gm">' + esc(d.game) + '</span><i class="chev"></i></button>' +
         '<div class="dbody"><div class="dinner"><div class="dpad">' + (d.img ? '<img class="dimg" src="' + d.img + '" alt="">' : "") +
         '<div class="ptop"><div><p class="game">' + esc(d.game) + '</p><p>' + esc(d.desc) + '</p></div><dl class="facts">' + facts + '</dl></div>' +
-        regionsHtml(d) + '</div></div></div></div>';
+        staffHtml(d) + regionsHtml(d) + '</div></div></div></div>';
     }).join("") || '<p class="muted" style="padding:1.5rem">Belum ada divisi.</p>';
     var c = document.getElementById("cntDiv"); if (c) c.textContent = String(S.divisions.length).padStart(2, "0");
   }
@@ -1028,24 +1039,30 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
       if (d) {
         if (aReg >= d.regions.length) aReg = 0;
         var rg = d.regions[aReg], rp = "divisions." + aSel + ".regions." + aReg;
-        h += '<div class="acard"><label class="alabel">Region <select id="aReg">' + d.regions.map(function (g, i) { return '<option value="' + i + '"' + (i === aReg ? " selected" : "") + '>' + esc(g.name) + '</option>'; }).join("") + '</select></label>' +
-          (rg ? fld(rp + ".name", rg.name, "Nama region") + '<div><button class="abtn" type="button" data-regdel="1">Hapus region</button></div>' : '') + '</div>' +
-          '<form class="aform" id="regAdd"><input name="name" placeholder="Region baru (mis. Malaysia)" required><button class="btn" type="submit">Tambah region</button></form>';
+        h += '<div class="acard"><label class="alabel">Pilih region <select id="aReg">' + d.regions.map(function (g, i) { return '<option value="' + i + '"' + (i === aReg ? " selected" : "") + '>' + esc(g.name) + '</option>'; }).join("") + '</select></label>' +
+          (rg ? fld(rp + ".name", rg.name, "Nama region") + fld(rp + ".code", rg.code || "", "Kode negara (ID, MY, PH, SG)") + '<div><button class="abtn" type="button" data-regdel="1">Hapus region</button></div>' : '') + '</div>' +
+          '<form class="aform" id="regAdd"><input name="name" placeholder="Nama region (mis. Indonesia)" required><input name="code" placeholder="Kode negara (mis. ID)" maxlength="2" required><button class="btn" type="submit">Tambah region</button></form>';
         if (rg) {
-          if (aTm >= rg.teams.length) aTm = 0;
-          var tm = rg.teams[aTm], tp = rp + ".teams." + aTm;
-          h += '<div class="acard"><label class="alabel">Tim <select id="aTm">' + rg.teams.map(function (g, i) { return '<option value="' + i + '"' + (i === aTm ? " selected" : "") + '>' + esc(g.name) + '</option>'; }).join("") + '</select></label>' +
-            (tm ? fld(tp + ".name", tm.name, "Nama tim") + '<div><button class="abtn" type="button" data-tmdel="1">Hapus tim</button></div>' : '') + '</div>' +
-            '<form class="aform" id="tmAdd"><input name="name" placeholder="Tim baru (mis. Senior)" required><button class="btn" type="submit">Tambah tim</button></form>';
-          if (tm) {
-            tm.roster.forEach(function (r, i) {
-              var p = tp + ".roster." + i;
-              h += '<div class="acard"><div class="row">' + fld(p + ".1", r[1], "Handle") + fld(p + ".2", r[2], "Nama lengkap") + fld(p + ".3", r[3], "Peran") + '</div>' +
-                imgFld(p + ".5", r[5] || "", "Foto pemain (paling bagus PNG tanpa latar)") + '<div><button class="abtn" type="button" data-rdel="' + i + '">Hapus pemain</button></div></div>';
-            });
-            h += '<form class="aform" id="rAdd"><input name="handle" placeholder="Handle" required><input name="name" placeholder="Nama lengkap"><input name="role" placeholder="Peran"><button class="btn" type="submit">Tambah pemain</button></form>';
-          }
+          rg.roster.forEach(function (r, i) {
+            var p = rp + ".roster." + i;
+            h += '<div class="acard"><div class="row">' + fld(p + ".1", r[1], "Handle") + fld(p + ".2", r[2], "Nama lengkap") + fld(p + ".3", r[3], "Peran") + '</div>' +
+              imgFld(p + ".5", r[5] || "", "Foto pemain") + '<div><button class="abtn" type="button" data-rdel="' + i + '">Hapus pemain</button></div></div>';
+          });
+          h += '<form class="aform" id="rAdd"><input name="handle" placeholder="Handle" required><input name="name" placeholder="Nama lengkap"><input name="role" placeholder="Peran"><button class="btn" type="submit">Tambah pemain</button></form>';
         }
+      }
+    } else if (aTab === "staff") {
+      if (aSel >= S.divisions.length) aSel = 0;
+      h += '<label class="alabel">Divisi <select id="aSel">' + S.divisions.map(function (d, i) { return '<option value="' + i + '"' + (i === aSel ? " selected" : "") + '>' + esc(d.name) + '</option>'; }).join("") + '</select></label>';
+      var d = S.divisions[aSel];
+      if (d) {
+        if (!Array.isArray(d.staff)) d.staff = [];
+        d.staff.forEach(function (p, i) {
+          var sp = "divisions." + aSel + ".staff." + i;
+          h += '<div class="acard"><div class="row">' + fld(sp + ".name", p.name, "Nama") + '<label>Jabatan<select data-path="' + sp + '.role"><option' + (p.role === "Manager" ? " selected" : "") + '>Manager</option><option' + (p.role === "Coach" ? " selected" : "") + '>Coach</option></select></label></div>' +
+            fld(sp + ".detail", p.detail || "", "Detail") + imgFld(sp + ".img", p.img || "", "Foto manager / coach") + '<button class="abtn" type="button" data-sdel="' + i + '">Hapus</button></div>';
+        });
+        h += '<form class="aform" id="sAdd"><input name="name" placeholder="Nama manager / coach" required><select name="role"><option>Manager</option><option>Coach</option></select><input name="detail" placeholder="Detail singkat"><button class="btn" type="submit">Tambah Manager / Coach</button></form>';
       }
     } else if (aTab === "his") {
       S.history.forEach(function (x, i) {
@@ -1072,9 +1089,8 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     setPath(p, e.target.value); persist();
   });
   aBody.addEventListener("change", function (e) {
-    if (e.target.id === "aSel") { aSel = +e.target.value; aReg = 0; aTm = 0; renderAdmin(); return; }
-    if (e.target.id === "aReg") { aReg = +e.target.value; aTm = 0; renderAdmin(); return; }
-    if (e.target.id === "aTm") { aTm = +e.target.value; renderAdmin(); return; }
+    if (e.target.id === "aSel") { aSel = +e.target.value; aReg = 0; renderAdmin(); return; }
+    if (e.target.id === "aReg") { aReg = +e.target.value; renderAdmin(); return; }
     var p = e.target.getAttribute("data-img"), f = e.target.files && e.target.files[0];
     if (!p || !f) return;
     var rd = new FileReader();
@@ -1121,18 +1137,18 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     var a = e.target, v;
     if ((v = a.getAttribute("data-clr")) !== null) { setPath(v, ""); persist(); renderAdmin(); }
     else if ((v = a.getAttribute("data-ddel")) !== null) { if (confirm("Hapus divisi ini beserta rosternya?")) { S.divisions.splice(+v, 1); persist(); renderAdmin(); } }
-    else if ((v = a.getAttribute("data-rdel")) !== null) { S.divisions[aSel].regions[aReg].teams[aTm].roster.splice(+v, 1); persist(); renderAdmin(); }
-    else if (a.getAttribute("data-regdel")) { if (confirm("Hapus region ini beserta semua tim dan pemainnya?")) { S.divisions[aSel].regions.splice(aReg, 1); aReg = 0; aTm = 0; persist(); renderAdmin(); } }
-    else if (a.getAttribute("data-tmdel")) { if (confirm("Hapus tim ini beserta pemainnya?")) { S.divisions[aSel].regions[aReg].teams.splice(aTm, 1); aTm = 0; persist(); renderAdmin(); } }
+    else if ((v = a.getAttribute("data-rdel")) !== null) { S.divisions[aSel].regions[aReg].roster.splice(+v, 1); persist(); renderAdmin(); }
+    else if (a.getAttribute("data-regdel")) { if (confirm("Hapus region ini beserta semua pemainnya?")) { S.divisions[aSel].regions.splice(aReg, 1); aReg = 0; persist(); renderAdmin(); } }
+    else if ((v = a.getAttribute("data-sdel")) !== null) { S.divisions[aSel].staff.splice(+v, 1); persist(); renderAdmin(); }
     else if ((v = a.getAttribute("data-hdel")) !== null) { S.history.splice(+v, 1); persist(); renderAdmin(); }
   });
   aBody.addEventListener("submit", function (e) {
     e.preventDefault();
     var f = e.target;
     if (f.id === "dAdd") S.divisions.push({ id: "d" + Date.now(), name: f.name.value.trim(), game: f.game.value.trim(), desc: "", img: "", facts: [["Pelatih", ""], ["Manajer", ""]], stats: [], regions: [{ name: "Indonesia", teams: [{ name: "Senior", roster: [] }] }] });
-    else if (f.id === "regAdd") { S.divisions[aSel].regions.push({ name: f.name.value.trim(), teams: [{ name: "Senior", roster: [] }] }); aReg = S.divisions[aSel].regions.length - 1; aTm = 0; }
-    else if (f.id === "tmAdd") { var tl = S.divisions[aSel].regions[aReg].teams; tl.push({ name: f.name.value.trim(), roster: [] }); aTm = tl.length - 1; }
-    else if (f.id === "rAdd") S.divisions[aSel].regions[aReg].teams[aTm].roster.push(["00", f.handle.value.trim(), f.name.value.trim(), f.role.value.trim(), "", ""]);
+    else if (f.id === "regAdd") { S.divisions[aSel].regions.push({ name: f.name.value.trim(), code: f.code.value.trim().toUpperCase(), roster: [] }); aReg = S.divisions[aSel].regions.length - 1; }
+    else if (f.id === "rAdd") S.divisions[aSel].regions[aReg].roster.push(["00", f.handle.value.trim(), f.name.value.trim(), f.role.value.trim(), "", ""]);
+    else if (f.id === "sAdd") { if (!Array.isArray(S.divisions[aSel].staff)) S.divisions[aSel].staff = []; S.divisions[aSel].staff.push({ name: f.name.value.trim(), role: f.role.value, detail: f.detail.value.trim(), img: "" }); }
     else if (f.id === "hAdd") S.history.push({ year: f.year.value.trim(), title: f.title.value.trim(), text: "", img: "" });
     persist(); renderAdmin();
   });
