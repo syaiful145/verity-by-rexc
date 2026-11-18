@@ -1052,7 +1052,7 @@ td.handle{font-size:1.1rem}
         '<button class="dhead" type="button" aria-expanded="' + (i === openDiv) + '"><span class="no">' + String(i + 1).padStart(2, "0") + '</span><span class="nm">' + (regionFlag(d.code) ? regionFlag(d.code) + ' ' : '') + esc(d.name) + '</span><span class="gm">' + esc(d.game) + '</span><i class="chev"></i></button>' +
         '<div class="dbody"><div class="dinner"><div class="dpad">' +
         '<section class="division-hero"><div class="division-copy"><p class="division-kicker">' + esc(game.name) + ' <span> / DIVISION</span></p><h3>' + esc(d.name) + '</h3><p class="division-description">' + esc(d.desc || "") + '</p><dl class="division-facts">' + facts +
-        '<div><dt>Negara</dt><dd>' + (regionFlag(d.code) ? regionFlag(d.code) + ' ' : '') + esc(country) + '</dd></div><div><dt>Roster</dt><dd>' + rosterCount + ' Pemain</dd></div></dl></div><div class="division-logo">' +
+        '<div><dt>Negara</dt><dd>' + (regionFlag(d.code) ? regionFlag(d.code) + ' ' : '') + esc(country) + '</dd></div><div><dt>Roster</dt><dd>' + rosterCount + ' Personel</dd></div></dl></div><div class="division-logo">' +
         (d.img ? '<img src="' + esc(d.img) + '" alt="Logo ' + esc(d.name) + '">' : '<span class="division-logo-mark">V</span>') + '</div></section>' +
         regionsHtml(d) + staffHtml(d, i) + '</div></div></div></div>';
     }).join("") + '</section>';
@@ -1472,7 +1472,7 @@ td.handle{font-size:1.1rem}
           h += '<div class="acard"><div class="row">' + fld(sp + ".name", p.name, "Nama personel manajemen") + fld(sp + ".role", p.role || "", "Keterangan / jabatan (contoh: Coach)") + '</div>' +
             countryFld(sp + ".code", p.code || d.code, "ID negara manajemen") + fld(sp + ".detail", p.detail || "", "Detail tambahan", true) + imgFld(sp + ".img", p.img || "", "Foto manajemen") + '<button class="abtn" type="button" data-sdel="' + i + '">Hapus manajemen</button></div>';
         });
-        h += '<form class="aform" id="sAdd"><input name="name" placeholder="Nama personel manajemen" required><input name="role" placeholder="Jabatan (mis. Coach, Manager, Analyst)" required><input name="detail" placeholder="Detail tambahan"><input name="code" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" value="" + esc(d.code) + "" placeholder="ID negara (contoh ID, MY, US)" required><button class="btn" type="submit">Tambah manajemen</button></form>';
+        h += '<form class="aform" id="sAdd"><input name="name" placeholder="Nama personel manajemen" required><input name="role" placeholder="Jabatan (mis. Coach, Manager, Analyst)" required><input name="detail" placeholder="Detail tambahan"><input name="code" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" value="' + esc(d.code) + '" placeholder="ID negara (contoh ID, MY, US)" required><button class="btn" type="submit">Tambah manajemen</button></form>';
       }
     } else if (aTab === "his") {
       S.history.forEach(function (x, i) {
