@@ -568,22 +568,22 @@ td.handle{font-size:1.1rem}
 .division-facts dt{margin:0 0 .2rem;color:var(--mute);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase}
 .division-facts dd{display:flex;align-items:center;gap:.4rem;margin:0;color:var(--bone);font-family:var(--hud);font-size:.95rem;font-weight:800}
 .division-logo{display:flex;align-items:center;justify-content:center;min-width:0;min-height:155px}
-/* Grid divisi dibuat menyebar lembut, memudar saat mendekati logo agar tidak membentuk kotak */
+/* Grid dekoratif sangat halus: garis memudar lebar dan bertahap menuju logo */
 .division-logo{position:relative;isolation:isolate;overflow:hidden}
 .division-logo::before{
- content:"";position:absolute;z-index:-1;inset:-35%;
+ content:"";position:absolute;z-index:-1;inset:-55%;
  background-image:
-  linear-gradient(rgba(255,196,0,.09) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(255,196,0,.09) 1px,transparent 1px);
- background-size:32px 32px;
- -webkit-mask-image:radial-gradient(ellipse at center,transparent 0%,rgba(0,0,0,.08) 27%,rgba(0,0,0,.48) 53%,#000 82%,transparent 100%);
- mask-image:radial-gradient(ellipse at center,transparent 0%,rgba(0,0,0,.08) 27%,rgba(0,0,0,.48) 53%,#000 82%,transparent 100%);
- opacity:.48;animation:divisionGridDrift 24s linear infinite;
+  linear-gradient(rgba(255,196,0,.075) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,196,0,.075) 1px,transparent 1px);
+ background-size:34px 34px;
+ -webkit-mask-image:radial-gradient(ellipse at center,transparent 0%,transparent 34%,rgba(0,0,0,.025) 45%,rgba(0,0,0,.12) 61%,rgba(0,0,0,.3) 78%,transparent 100%);
+ mask-image:radial-gradient(ellipse at center,transparent 0%,transparent 34%,rgba(0,0,0,.025) 45%,rgba(0,0,0,.12) 61%,rgba(0,0,0,.3) 78%,transparent 100%);
+ opacity:.42;
  pointer-events:none
 }
 .division-logo::after{
- content:"";position:absolute;z-index:-1;inset:0;
- background:radial-gradient(ellipse at center,rgba(255,196,0,.055),transparent 72%);
+ content:"";position:absolute;z-index:-1;inset:-15%;
+ background:radial-gradient(ellipse at center,transparent 20%,rgba(8,10,14,.08) 62%,transparent 88%);
  pointer-events:none
 }
 .division-logo img,.division-logo-mark{position:relative;z-index:1}
