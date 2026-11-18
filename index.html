@@ -446,6 +446,29 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   @media(max-width:520px){.dhead .gm{display:none}.public-game-title{padding:.85rem 1rem}}
 @media(max-width:600px){.staff-row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name more" "role role";gap:.35rem .7rem}.staff-role{grid-area:role;grid-column:1/-1;text-align:center}.staff-more{grid-area:more;grid-column:2;grid-row:1}}
 
+
+/* Animasi menyeluruh untuk isi setiap halaman dan tab */
+@keyframes contentEnter{from{opacity:0;transform:translate3d(0,18px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes contentSoftEnter{from{opacity:0;transform:translate3d(0,10px,0) scale(.99)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+.view.on .wrap.block > *, .view.on .hero-grid > *, .view.on .strip > *, .view.on .quick > *, .view.on .news > *, .view.on .pillars > *, .view.on .info > *, .view.on .tl > article, .view.on .public-game-group, .view.on .dit{animation:contentEnter .55s cubic-bezier(.2,.7,.2,1) both}
+.view.on .wrap.block > *:nth-child(2), .view.on .hero-grid > *:nth-child(2), .view.on .strip > *:nth-child(2), .view.on .quick > *:nth-child(2), .view.on .news > *:nth-child(2), .view.on .pillars > *:nth-child(2), .view.on .info > *:nth-child(2), .view.on .tl > article:nth-child(2), .view.on .public-game-group:nth-child(2), .view.on .dit:nth-child(2){animation-delay:.07s}
+.view.on .wrap.block > *:nth-child(3), .view.on .quick > *:nth-child(3), .view.on .news > *:nth-child(3), .view.on .pillars > *:nth-child(3), .view.on .info > *:nth-child(3), .view.on .tl > article:nth-child(3), .view.on .public-game-group:nth-child(3), .view.on .dit:nth-child(3){animation-delay:.14s}
+.view.on .dpad > *, .view.on .pgrid .pc, .view.on .staff-row, .view.on .staff-detail-card{animation:contentSoftEnter .48s cubic-bezier(.2,.7,.2,1) both}
+.view.on .pgrid .pc:nth-child(2), .view.on .staff-list .staff-row:nth-child(2){animation-delay:.06s}
+.view.on .pgrid .pc:nth-child(3), .view.on .staff-list .staff-row:nth-child(3){animation-delay:.12s}
+.view.on .pgrid .pc:nth-child(4), .view.on .staff-list .staff-row:nth-child(4){animation-delay:.18s}
+.view.on .pgrid .pc:nth-child(5), .view.on .staff-list .staff-row:nth-child(5){animation-delay:.24s}
+#aBody > .acard, #aBody > .aform, #aBody > .tx, #aBody > .alabel{animation:contentEnter .5s cubic-bezier(.2,.7,.2,1) both}
+#aBody > .acard:nth-child(2), #aBody > .aform:nth-child(2), #aBody > .tx:nth-child(2){animation-delay:.06s}
+#aBody > .acard:nth-child(3){animation-delay:.12s}
+#aBody > .acard:nth-child(4){animation-delay:.18s}
+#aBody > .acard:nth-child(5){animation-delay:.24s}
+#aBody .acard > *, #aBody .acard .row > *, #aBody .aform > *, #aBody .tx > *{animation:contentSoftEnter .42s ease both}
+#aBody .acard > *:nth-child(2), #aBody .acard .row > *:nth-child(2), #aBody .aform > *:nth-child(2), #aBody .tx > *:nth-child(2){animation-delay:.05s}
+#aBody .acard > *:nth-child(3), #aBody .acard .row > *:nth-child(3), #aBody .aform > *:nth-child(3), #aBody .tx > *:nth-child(3){animation-delay:.1s}
+.atab,.btn,.abtn,.quick a,.news article,.pillars > div,.info > div,.pc,.dhead{transition:transform .22s ease,background-color .22s ease,border-color .22s ease,box-shadow .22s ease}
+.atab:hover,.btn:hover,.abtn:hover,.quick a:hover,.news article:hover,.pillars > div:hover,.info > div:hover,.pc:hover{transform:translateY(-2px)}
+@media (prefers-reduced-motion:reduce){.view.on,.view.on *,#aBody *,#atabs *, .atab,.btn,.abtn,.quick a,.news article,.pillars > div,.info > div,.pc,.dhead{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body class="intro-on">
