@@ -1040,14 +1040,16 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   var saveTimer = null, saveVersion = 0;
   function persist() {
     S.divisions.forEach(function (d) {
-      d.regions.forEach(function (g) {
-        g.roster.forEach(function (p, i) { p[0] = String(i + 1).padStart(2, "0"); });
-        g.teams = [{ name: "Senior", roster: g.roster.map(function (p) {
-          var legacyRole = p[4] === "Kapten" ? "lead" : (p[4] === "Cadangan" ? "sub" : "");
-          var legacyPosition = [p[4], p[3]].filter(Boolean).join(" · ");
-          return [p[0], p[1], p[2], legacyPosition, legacyRole, p[5] || ""];
-        }) }];
-      });
+      d.code = String(d.code || "ID").toUpperCase();
+      if (!Array.isArray(d.regions) || !d.regions.length) d.regions = [{ name: regionCountryName(d.code) || "Indonesia", code: d.code, roster: [], teams: [] }];
+      var roster = d.regions.reduce(function (all, g) { return all.concat(g.roster || []); }, []);
+      roster.forEach(function (p, i) { p[0] = String(i + 1).padStart(2, "0"); if (!p[6]) p[6] = d.code; });
+      d.regions = [{ name: regionCountryName(d.code) || "Indonesia", code: d.code, roster: roster, teams: [] }];
+      d.regions[0].teams = [{ name: "Senior", roster: roster.map(function (p) {
+        var legacyRole = p[4] === "Kapten" ? "lead" : (p[4] === "Cadangan" ? "sub" : "");
+        var legacyPosition = [p[4], p[3]].filter(Boolean).join(" · ");
+        return [p[0], p[1], p[2], legacyPosition, legacyRole, p[5] || ""];
+      }) }];
     });
     renderAll();
     adminMsg("Sedang menyimpan...");
@@ -1204,17 +1206,23 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     var a = e.target, v;
     if ((v = a.getAttribute("data-clr")) !== null) { setPath(v, ""); persist(); renderAdmin(); }
     else if ((v = a.getAttribute("data-ddel")) !== null) { if (confirm("Hapus divisi ini beserta rosternya?")) { S.divisions.splice(+v, 1); persist(); renderAdmin(); } }
-    else if ((v = a.getAttribute("data-rdel")) !== null) { S.divisions[aSel].regions[aReg].roster.splice(+v, 1); persist(); renderAdmin(); }
-    else if (a.getAttribute("data-regdel")) { if (confirm("Hapus region ini beserta semua pemainnya?")) { S.divisions[aSel].regions.splice(aReg, 1); aReg = 0; persist(); renderAdmin(); } }
+    else if ((v = a.getAttribute("data-rdel")) !== null) { S.divisions[aSel].regions[0].roster.splice(+v, 1); persist(); renderAdmin(); }
     else if ((v = a.getAttribute("data-sdel")) !== null) { S.divisions[aSel].staff.splice(+v, 1); persist(); renderAdmin(); }
     else if ((v = a.getAttribute("data-hdel")) !== null) { S.history.splice(+v, 1); persist(); renderAdmin(); }
   });
   aBody.addEventListener("submit", function (e) {
     e.preventDefault();
     var f = e.target;
-    if (f.id === "dAdd") S.divisions.push({ id: "d" + Date.now(), name: f.name.value.trim(), game: f.game.value.trim(), desc: "", img: "", facts: [["Pelatih", ""], ["Manajer", ""]], stats: [], staff: [], regions: [{ name: "Indonesia", code: "ID", roster: [], teams: [{ name: "Senior", roster: [] }] }] });
-    else if (f.id === "regAdd") { var countryCode = f.code.value.trim().toUpperCase(), countryName = regionCountryName(countryCode); if (!countryName) { adminMsg("ID negara tidak dikenali. Masukkan kode negara ISO 2 huruf, misalnya ID, US, atau JP."); return; } S.divisions[aSel].regions.push({ name: countryName, code: countryCode, roster: [], teams: [] }); aReg = S.divisions[aSel].regions.length - 1; }
-    else if (f.id === "rAdd") S.divisions[aSel].regions[aReg].roster.push(["00", f.name.value.trim(), f.realName.value.trim(), f.position.value.trim(), f.role.value.trim(), ""]);
+    if (f.id === "dAdd") {
+      var divisionCode = f.code.value.trim().toUpperCase();
+      if (!regionCountryName(divisionCode)) { adminMsg("ID negara divisi tidak dikenali. Gunakan kode negara ISO 2 huruf."); return; }
+      S.divisions.push({ id: "d" + Date.now(), name: f.name.value.trim(), game: f.game.value.trim(), code: divisionCode, desc: "", img: "", facts: [["Pelatih", ""], ["Manajer", ""]], stats: [], staff: [], regions: [{ name: regionCountryName(divisionCode), code: divisionCode, roster: [], teams: [] }] });
+    }
+    else if (f.id === "rAdd") {
+      var playerCode = f.code.value.trim().toUpperCase();
+      if (!regionCountryName(playerCode)) { adminMsg("ID negara pemain tidak dikenali. Gunakan kode negara ISO 2 huruf."); return; }
+      S.divisions[aSel].regions[0].roster.push(["00", f.name.value.trim(), f.realName.value.trim(), f.position.value.trim(), f.role.value.trim(), "", playerCode]);
+    }
     else if (f.id === "sAdd") { if (!Array.isArray(S.divisions[aSel].staff)) S.divisions[aSel].staff = []; S.divisions[aSel].staff.push({ name: f.name.value.trim(), role: f.role.value.trim(), detail: f.detail.value.trim(), img: "" }); }
     else if (f.id === "hAdd") S.history.push({ year: f.year.value.trim(), title: f.title.value.trim(), text: "", img: "" });
     persist(); renderAdmin();
