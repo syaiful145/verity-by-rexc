@@ -17,13 +17,20 @@ function collectBlobUrls(value, urls = new Set()) {
   return urls;
 }
 
+function logDatabaseError(operation, error) {
+  const message = String(error?.message || error || "Unknown database error")
+    .replace(/(postgres(?:ql)?:\\/\\/[^:]+:)[^@]+@/gi, "$1[redacted]@");
+  console.error(`[site-data] ${operation} failed:`, error?.name || "Error", message);
+}
+
 export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       const sql = getDb();
       const rows = await sql`SELECT data FROM verity_site_state WHERE id = 1`;
       return sendJson(res, 200, { data: rows[0]?.data ?? null });
-    } catch {
+    } catch (error) {
+      logDatabaseError("GET", error);
       return sendJson(res, 503, {
         error: "Database belum siap. Periksa DATABASE_URL di Vercel dan jalankan database/schema.sql di Neon."
       });
@@ -64,7 +71,8 @@ export default async function handler(req, res) {
       }
 
       return sendJson(res, 200, { ok: true, cleanupWarning });
-    } catch {
+    } catch (error) {
+      logDatabaseError("PUT", error);
       return sendJson(res, 500, { error: "Gagal menyimpan data ke database." });
     }
   }
