@@ -601,7 +601,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     <div class="atabs" role="tablist" id="atabs">
       <button class="atab on" data-a="div" type="button">Divisi</button>
       <button class="atab" data-a="ros" type="button">Roster &amp; Region</button>
-      <button class="atab" data-a="staff" type="button">Anggota</button>
+      <button class="atab" data-a="staff" type="button">Manajemen</button>
       <button class="atab" data-a="his" type="button">Sejarah</button>
       <button class="atab" data-a="txt" type="button">Teks &amp; foto utama</button>
     </div>
@@ -694,7 +694,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   }
   function staffHtml(d) {
     if (!d.staff || !d.staff.length) return "";
-    return '<section class="reg staff-section"><div class="rgh"><h4>Anggota</h4></div><div class="pgrid">' + d.staff.map(function (p) {
+    return '<section class="reg staff-section"><div class="rgh"><h4>Manajemen</h4></div><div class="pgrid">' + d.staff.map(function (p) {
       return '<article class="pc"><div class="pimg">' + (p.img ? '<img src="' + p.img + '" alt="' + esc(p.name) + '">' : SIL) + '</div><div class="pinfo"><h5>' + esc(p.name) + '</h5><span class="pr">' + esc(p.role) + '</span><details><summary>Lihat detail</summary><span class="pn">' + esc(p.detail || p.name) + '</span></details></div></article>';
     }).join("") + '</div></section>';
   }
