@@ -700,6 +700,54 @@ html body img.country-flag{
  }
 }
 </style>
+
+<style id="verity-division-polish-2026-11">
+/* Nomor divisi mengikuti urutan tampilan lintas game; jarak antarkelompok dirapatkan. */
+.public-game-group + .public-game-group{margin-top:.45rem}
+.public-game-title{margin:0;padding:.72rem 1rem;line-height:1.2}
+.public-game-group .dit{background:var(--ink-2)}
+.dhead:focus-visible{background:transparent;outline:1px solid rgba(255,196,0,.35);outline-offset:-2px}
+@media(hover:none){.dhead:hover{background:var(--ink-2)}}
+
+/* Logo tanpa bidang kotak: cahaya emas menyebar lembut lalu hilang ke latar. */
+.division-logo{overflow:visible}
+.division-logo::before{
+ content:"";position:absolute;z-index:0;inset:-38%;
+ background:radial-gradient(ellipse at center,
+  rgba(255,196,0,.13) 0%,
+  rgba(255,196,0,.075) 28%,
+  rgba(255,196,0,.028) 52%,
+  rgba(255,196,0,0) 78%);
+ filter:blur(13px);opacity:.9;pointer-events:none
+}
+.division-logo::after{
+ content:"";position:absolute;z-index:0;inset:-25%;
+ background:radial-gradient(ellipse at center,
+  rgba(255,196,0,.035) 0%,
+  rgba(255,196,0,.012) 42%,
+  transparent 76%);
+ filter:blur(18px);pointer-events:none
+}
+.division-logo img,.division-logo-mark{z-index:1}
+
+/* Intro: grid hanya tampak samar di sekitar logo dan memudar tanpa batas persegi. */
+#intro .grid{
+ inset:-18%;
+ -webkit-mask-image:radial-gradient(ellipse 42% 34% at 50% 48%,
+  rgba(0,0,0,.28) 0%,rgba(0,0,0,.2) 34%,
+  rgba(0,0,0,.07) 58%,transparent 82%);
+ mask-image:radial-gradient(ellipse 42% 34% at 50% 48%,
+  rgba(0,0,0,.28) 0%,rgba(0,0,0,.2) 34%,
+  rgba(0,0,0,.07) 58%,transparent 82%);
+}
+#intro .glow{
+ width:94vmin;height:94vmin;
+ background:radial-gradient(circle,
+  rgba(255,196,0,.17) 0%,
+  rgba(255,196,0,.085) 34%,
+  rgba(255,196,0,.025) 58%,transparent 76%);
+}
+</style>
 </head>
 <body class="intro-on">
 
@@ -1035,16 +1083,18 @@ html body img.country-flag{
   }
   function renderDivList() {
     ensureGames();
+    var displayNumber = 0;
     var divisionMarkup = S.games.map(function (game) {
       var entries = S.divisions.map(function (d, i) { return { division: d, index: i }; }).filter(function (entry) { return entry.division.gameId === game.id; });
       if (!entries.length) return "";
       return '<section class="public-game-group"><h3 class="public-game-title">' + esc(game.name) + '</h3>' + entries.map(function (entry) {
       var d = entry.division, i = entry.index;
+      displayNumber += 1;
       var facts = d.facts.filter(function (f) { return !/^(pelatih|coach|manager|manajer)$/i.test(f[0]); }).map(function (f) { return '<div><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></div>'; }).join("");
       var rosterCount = d.regions.reduce(function (total, rg) { return total + (rg.roster || []).length; }, 0) + (Array.isArray(d.staff) ? d.staff.length : 0);
       var country = regionCountryName(d.code) || d.code || "—";
       return '<div class="dit' + (i === openDiv ? " open" : "") + '" data-i="' + i + '">' +
-        '<button class="dhead" type="button" aria-expanded="' + (i === openDiv) + '"><span class="no">' + String(i + 1).padStart(2, "0") + '</span><span class="nm">' + (regionFlag(d.code) ? regionFlag(d.code) + ' ' : '') + esc(d.name) + '</span><span class="gm">' + esc(d.game) + '</span><i class="chev"></i></button>' +
+        '<button class="dhead" type="button" aria-expanded="' + (i === openDiv) + '"><span class="no">' + String(displayNumber).padStart(2, "0") + '</span><span class="nm">' + (regionFlag(d.code) ? regionFlag(d.code) + ' ' : '') + esc(d.name) + '</span><span class="gm">' + esc(d.game) + '</span><i class="chev"></i></button>' +
         '<div class="dbody"><div class="dinner"><div class="dpad">' +
         '<section class="division-hero"><div class="division-copy"><p class="division-kicker">' + esc(game.name) + ' <span> / DIVISION</span></p><h3>' + esc(d.name) + '</h3><p class="division-description">' + esc(d.desc || "") + '</p><dl class="division-facts">' + facts +
         '<div><dt>Negara</dt><dd>' + (regionFlag(d.code) ? regionFlag(d.code) + ' ' : '') + esc(country) + '</dd></div><div><dt>Roster</dt><dd>' + rosterCount + ' Personel</dd></div></dl></div><div class="division-logo">' +
