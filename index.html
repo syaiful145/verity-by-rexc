@@ -1078,7 +1078,13 @@ html body img.country-flag{
   function renderDivList() {
     ensureGames();
     var displayNumber = 0;
-    var divisionMarkup = S.games.map(function (game) {
+    /* Free Fire menjadi divisi pertama; urutan game lain tetap mengikuti pengaturan admin. */
+    var orderedGames = S.games.slice().sort(function (a, b) {
+      var aFreeFire = /^(free\s*fire|ff)$/i.test(String(a.name || "").trim()) ? 0 : 1;
+      var bFreeFire = /^(free\s*fire|ff)$/i.test(String(b.name || "").trim()) ? 0 : 1;
+      return aFreeFire - bFreeFire;
+    });
+    var divisionMarkup = orderedGames.map(function (game) {
       var entries = S.divisions.map(function (d, i) { return { division: d, index: i }; }).filter(function (entry) { return entry.division.gameId === game.id; });
       if (!entries.length) return "";
       return '<section class="public-game-group"><h3 class="public-game-title">' + esc(game.name) + '</h3>' + entries.map(function (entry) {
