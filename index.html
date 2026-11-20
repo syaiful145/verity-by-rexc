@@ -709,26 +709,24 @@ html body img.country-flag{
 .dhead:focus-visible{background:transparent;outline:1px solid rgba(255,196,0,.35);outline-offset:-2px}
 @media(hover:none){.dhead:hover{background:var(--ink-2)}}
 
-/* Logo tanpa bidang kotak: cahaya emas menyebar lembut lalu hilang ke latar. */
-.division-logo{overflow:visible}
+/* Latar logo: grid halus tanpa panel/kotak, memudar radial di sekeliling logo. */
+.division-logo{position:relative;isolation:isolate;overflow:visible;background:transparent}
 .division-logo::before{
- content:"";position:absolute;z-index:0;inset:-38%;
- background:radial-gradient(ellipse at center,
-  rgba(255,196,0,.13) 0%,
-  rgba(255,196,0,.075) 28%,
-  rgba(255,196,0,.028) 52%,
-  rgba(255,196,0,0) 78%);
- filter:blur(13px);opacity:.9;pointer-events:none
+ content:"";position:absolute;z-index:0;inset:-48%;
+ background-image:
+  linear-gradient(rgba(255,196,0,.055) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,196,0,.055) 1px,transparent 1px);
+ background-size:30px 30px;
+ -webkit-mask-image:radial-gradient(ellipse at center,#000 0%,rgba(0,0,0,.72) 26%,rgba(0,0,0,.24) 49%,transparent 72%);
+ mask-image:radial-gradient(ellipse at center,#000 0%,rgba(0,0,0,.72) 26%,rgba(0,0,0,.24) 49%,transparent 72%);
+ opacity:.52;pointer-events:none
 }
 .division-logo::after{
- content:"";position:absolute;z-index:0;inset:-25%;
- background:radial-gradient(ellipse at center,
-  rgba(255,196,0,.035) 0%,
-  rgba(255,196,0,.012) 42%,
-  transparent 76%);
- filter:blur(18px);pointer-events:none
+ content:"";position:absolute;z-index:0;inset:-35%;
+ background:radial-gradient(ellipse at center,rgba(255,196,0,.085) 0%,rgba(255,196,0,.035) 34%,transparent 70%);
+ filter:blur(22px);pointer-events:none
 }
-.division-logo img,.division-logo-mark{z-index:1}
+.division-logo img,.division-logo-mark{position:relative;z-index:1}
 
 /* Intro: grid hanya tampak samar di sekitar logo dan memudar tanpa batas persegi. */
 #intro .grid{
