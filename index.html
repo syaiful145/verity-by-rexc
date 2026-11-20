@@ -702,9 +702,10 @@ html body img.country-flag{
 </style>
 
 <style id="verity-division-polish-2026-11">
-/* Nomor divisi mengikuti urutan tampilan lintas game; jarak antarkelompok dirapatkan. */
-.public-game-group + .public-game-group{margin-top:.45rem}
-.public-game-title{margin:0;padding:.72rem 1rem;line-height:1.2}
+/* Kelompok game menyambung rapat tanpa celah kosong di antaranya. */
+.public-game-group{margin:0!important;padding:0}
+.public-game-group + .public-game-group{margin-top:0!important}
+.public-game-title{display:block;margin:0;padding:.72rem 1rem;line-height:1.2;border-top:1px solid var(--line)}
 .public-game-group .dit{background:var(--ink-2)}
 .dhead:focus-visible{background:transparent;outline:1px solid rgba(255,196,0,.35);outline-offset:-2px}
 @media(hover:none){.dhead:hover{background:var(--ink-2)}}
