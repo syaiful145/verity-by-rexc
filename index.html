@@ -1677,5 +1677,25 @@ html body img.country-flag{
   route();
 })();
 </script>
+
+<style id="country-label-alignment">
+/* Bendera dan label negara sejajar untuk semua kode ISO dua huruf. */
+html body .player-region,
+html body .staff-name,
+html body .dhead .nm,
+html body .division-facts dd{
+  display:inline-flex !important;
+  align-items:center !important;
+  vertical-align:middle !important;
+  gap:.4rem !important;
+  line-height:1.25 !important;
+}
+html body .player-region{white-space:normal}
+html body .staff-name{min-width:0}
+html body .dhead .nm{min-width:0}
+html body .country-flag-wrap{vertical-align:middle !important;align-self:center !important}
+html body img.country-flag{vertical-align:middle !important;flex:none !important}
+</style>
+
 </body>
 </html>
