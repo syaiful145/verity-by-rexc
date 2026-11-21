@@ -118,8 +118,8 @@ button{font:inherit;color:inherit}
 .dit.open .dpad{opacity:1;transform:none}
 .pgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin-top:1rem;align-items:stretch}
 .pgrid .pc{min-width:0;flex:0 0 calc(var(--roster-card-width,50%) - var(--roster-card-gap-share,.5rem))}
-@media (min-width:600px) and (max-width:899px){.pgrid{--roster-card-width:var(--roster-card-width-tablet);--roster-card-gap-share:var(--roster-card-gap-share-tablet)}}
-@media (max-width:599px){.pgrid{gap:.7rem;--roster-card-width:var(--roster-card-width-mobile);--roster-card-gap-share:var(--roster-card-gap-share-mobile)}.pinfo{padding:.2rem .5rem .8rem}.pinfo h5{font-size:1.05rem;overflow-wrap:anywhere}.pinfo .pn{font-size:.75rem}.pinfo .pr{font-size:.62rem;letter-spacing:.08em}}
+@media (min-width:600px) and (max-width:899px){.pgrid{--roster-card-gap-share:var(--roster-card-gap-share-tablet)}.pgrid .pc{flex-basis:calc(var(--roster-card-width-tablet,33.3333%) - var(--roster-card-gap-share-tablet,.35rem))}}
+@media (max-width:599px){.pgrid{gap:.7rem;--roster-card-gap-share:var(--roster-card-gap-share-mobile)}.pgrid .pc{flex-basis:calc(var(--roster-card-width-mobile,50%) - var(--roster-card-gap-share-mobile,.35rem))}.pinfo{padding:.2rem .5rem .8rem}.pinfo h5{font-size:1.05rem;overflow-wrap:anywhere}.pinfo .pn{font-size:.75rem}.pinfo .pr{font-size:.62rem;letter-spacing:.08em}}
 .pc{background:var(--ink-3);border:1px solid var(--line);overflow:hidden}
 
 .pimg{position:relative;aspect-ratio:4/5;background:radial-gradient(ellipse at 50% 18%,rgba(255,196,0,.22),transparent 62%),linear-gradient(#1d1d23,#101013);overflow:hidden}
@@ -1090,8 +1090,6 @@ html body img.country-flag{
     modal.setAttribute("aria-label", "Detail manajemen " + (p.name || ""));
     modal.setAttribute("data-staff-key", divisionIndex + "-" + staffIndex);
     modal.innerHTML = '<article class="pc staff-detail-card"><div class="pimg staff-detail-photo">' + (p.img ? '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '">' : SIL) + '</div><div class="pinfo staff-detail-copy"><h5>' + esc(p.name || "") + '</h5>' + (p.role ? '<span class="pn">' + esc(p.role) + '</span>' : '') + (p.detail ? '<p class="staff-detail-text">' + esc(p.detail) + '</p>' : '') + '<span class="player-region">' + (regionFlag(p.code || d.code) ? regionFlag(p.code || d.code) + " " : "") + esc(regionCountryName(p.code || d.code) || p.code || d.code || "") + '</span></div></article>';
-    var rosterCard = document.querySelector(".roster-section .pgrid .pc");
-    if (rosterCard) { var rosterWidth = rosterCard.getBoundingClientRect().width; var detailCard = modal.querySelector(".staff-detail-card"); detailCard.style.width = rosterWidth + "px"; detailCard.style.flexBasis = rosterWidth + "px"; }
     modal.addEventListener("click", function (ev) { if (ev.target === modal) closeStaffDetail(); });
     document.body.appendChild(modal);
   }
