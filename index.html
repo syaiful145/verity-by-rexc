@@ -429,9 +429,9 @@ input:focus,select:focus{outline:none;border-color:var(--gold)}
 h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
 
 .staff-list{display:grid;gap:.45rem;margin-top:.8rem}
-.staff-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"name role more";gap:.45rem 1rem;align-items:center;text-align:left;background:var(--ink-3);border:1px solid var(--line);padding:.9rem 1rem;color:var(--bone);cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.staff-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"name role more";gap:.55rem 1.1rem;align-items:center;text-align:left;background:var(--ink-3);border:1px solid var(--line);padding:1.08rem 1.15rem;color:var(--bone);cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
 .staff-row:hover{background:var(--ink-2);border-color:var(--gold);transform:translateY(-2px)}
-.staff-name{grid-area:name;font-family:var(--hud);font-size:1.25rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.staff-name{grid-area:name;font-family:var(--hud);font-size:1.32rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
 .staff-name{display:flex;align-items:center;gap:.35rem;line-height:1.2}
 .staff-role{grid-area:role;display:block;width:max-content;max-width:100%;justify-self:center;align-self:center;text-align:center;color:var(--mute);font-family:var(--hud);font-size:.82rem;font-weight:400;letter-spacing:normal;text-transform:none}
 .staff-more{grid-area:more;justify-self:end;color:var(--gold);font-family:var(--hud);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
@@ -458,7 +458,7 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
   .dhead{gap:clamp(.55rem,2vw,1.2rem);padding:clamp(.9rem,2vw,1.3rem) clamp(.85rem,3vw,1.6rem)}
   .dhead .gm{font-size:clamp(.68rem,1.5vw,.85rem);text-align:right}
   @media(max-width:520px){.dhead .gm{display:none}.public-game-title{padding:.85rem 1rem}}
-@media(max-width:600px){.staff-row{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"name role more";gap:.3rem .45rem}.staff-name{min-width:0;font-size:1.05rem;overflow-wrap:anywhere}.staff-role{grid-area:role;grid-column:auto;justify-self:center;font-size:.75rem;letter-spacing:normal;white-space:nowrap}.staff-more{grid-area:more;grid-column:auto;grid-row:auto;font-size:.64rem}}
+@media(max-width:600px){.staff-row{padding:.98rem .85rem;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"name role more";gap:.35rem .5rem}.staff-name{min-width:0;font-size:1.1rem;overflow-wrap:anywhere}.staff-role{grid-area:role;grid-column:auto;justify-self:center;font-size:.75rem;letter-spacing:normal;white-space:nowrap}.staff-more{grid-area:more;grid-column:auto;grid-row:auto;font-size:.64rem}}
 
 
 /* Animasi menyeluruh untuk isi setiap halaman dan tab */
