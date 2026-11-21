@@ -760,6 +760,13 @@ html body img.country-flag{
 .staff-detail-modal .staff-detail-copy h5{font-size:1.1rem!important}
 }
 </style>
+
+<style id="admin-game-grouping">
+.admin-game-group{margin:1.25rem 0 1.7rem}
+.admin-game-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:0 0 .8rem;padding:.7rem .9rem;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;background:rgba(255,196,0,.045);font-size:1rem}
+.admin-game-heading span{color:var(--mute);font-size:.75rem;font-weight:500}
+.admin-game-empty{color:var(--mute);font-size:.85rem;padding:.2rem .3rem}
+</style>
 </head>
 <body class="intro-on">
 
@@ -1500,23 +1507,29 @@ html body img.country-flag{
       });
       h += '<form class="aform" id="gAdd"><input name="name" placeholder="Nama game baru" required><button class="btn" type="submit">Tambah game</button></form>';
     } else if (aTab === "div") {
-      S.divisions.forEach(function (d, i) {
-        var p = "divisions." + i;
-        h += '<div class="acard"><div class="row">' + fld(p + ".name", d.name, "Nama divisi") +
-          '<label>Game<select data-game-select="' + i + '" required>' + S.games.map(function (g) { return '<option value="' + esc(g.id) + '"' + (g.id === d.gameId ? " selected" : "") + '>' + esc(g.name) + '</option>'; }).join("") + '</select></label>' +
-          countryFld(p + ".code", d.code, "ID negara divisi") + '</div>' +
-          fld(p + ".desc", d.desc, "Deskripsi", true) +
-          '<div class="row">' + d.facts.map(function (f, j) { return /^(pelatih|coach|manager|manajer)$/i.test(f[0]) ? "" : fld(p + ".facts." + j + ".1", f[1], f[0]); }).join("") +
-          '</div>' +
-          imgFld(p + ".img", d.img, "Foto divisi") +
-          '<div><button class="abtn" type="button" data-ddel="' + i + '">Hapus divisi</button></div></div>';
+      S.games.forEach(function (g) {
+        var grouped = S.divisions.map(function (d, i) { return { d: d, i: i }; }).filter(function (x) { return x.d.gameId === g.id; });
+        h += '<section class="admin-game-group"><h3 class="admin-game-heading">' + esc(g.name) + '<span>' + grouped.length + ' divisi</span></h3>';
+        grouped.forEach(function (x) {
+          var d = x.d, i = x.i, p = "divisions." + i;
+          h += '<div class="acard"><div class="row">' + fld(p + ".name", d.name, "Nama divisi") +
+            '<label>Game<select data-game-select="' + i + '" required>' + S.games.map(function (game) { return '<option value="' + esc(game.id) + '"' + (game.id === d.gameId ? " selected" : "") + '>' + esc(game.name) + '</option>'; }).join("") + '</select></label>' +
+            countryFld(p + ".code", d.code, "ID negara divisi") + '</div>' +
+            fld(p + ".desc", d.desc, "Deskripsi", true) +
+            '<div class="row">' + d.facts.map(function (f, j) { return /^(pelatih|coach|manager|manajer)$/i.test(f[0]) ? "" : fld(p + ".facts." + j + ".1", f[1], f[0]); }).join("") +
+            '</div>' +
+            imgFld(p + ".img", d.img, "Foto divisi") +
+            '<div><button class="abtn" type="button" data-ddel="' + i + '">Hapus divisi</button></div></div>';
+        });
+        if (!grouped.length) h += '<p class="admin-game-empty">Belum ada divisi untuk game ini.</p>';
+        h += '</section>';
       });
       h += '<form class="aform" id="dAdd"><input name="name" placeholder="Nama divisi baru" required><select name="gameId" required>' +
         '<option value="">Pilih game</option>' + S.games.map(function (g) { return '<option value="' + esc(g.id) + '">' + esc(g.name) + '</option>'; }).join("") +
         '</select><input name="code" maxlength="2" minlength="2" pattern="[A-Za-z]{2}" placeholder="ID negara (contoh ID)" required><button class="btn" type="submit"' + (!S.games.length ? ' disabled' : '') + '>Tambah divisi</button></form>';
     } else if (aTab === "ros") {
       if (aSel >= S.divisions.length) aSel = 0;
-      h += '<label class="alabel">Divisi <select id="aSel">' + S.divisions.map(function (d, i) { return '<option value="' + i + '"' + (i === aSel ? " selected" : "") + '>' + esc((S.games.find(function (g) { return g.id === d.gameId; }) || {}).name || d.game) + ' · ' + esc(d.name) + '</option>'; }).join("") + '</select></label>';
+      h += '<label class="alabel">Divisi <select id="aSel">' + S.games.map(function (g) { var opts = S.divisions.map(function (d, i) { return { d: d, i: i }; }).filter(function (x) { return x.d.gameId === g.id; }); return opts.length ? '<optgroup label="' + esc(g.name) + '">' + opts.map(function (x) { return '<option value="' + x.i + '"' + (x.i === aSel ? " selected" : "") + '>' + esc(x.d.name) + '</option>'; }).join("") + '</optgroup>' : ''; }).join("") + '</select></label>';
       var d = S.divisions[aSel];
       if (d) {
         var rp = "divisions." + aSel + ".regions.0", rg = d.regions[0];
@@ -1531,7 +1544,7 @@ html body img.country-flag{
       }
     } else if (aTab === "staff") {
       if (aSel >= S.divisions.length) aSel = 0;
-      h += '<label class="alabel">Divisi <select id="aSel">' + S.divisions.map(function (d, i) { return '<option value="' + i + '"' + (i === aSel ? " selected" : "") + '>' + esc((S.games.find(function (g) { return g.id === d.gameId; }) || {}).name || d.game) + ' · ' + esc(d.name) + '</option>'; }).join("") + '</select></label>';
+      h += '<label class="alabel">Divisi <select id="aSel">' + S.games.map(function (g) { var opts = S.divisions.map(function (d, i) { return { d: d, i: i }; }).filter(function (x) { return x.d.gameId === g.id; }); return opts.length ? '<optgroup label="' + esc(g.name) + '">' + opts.map(function (x) { return '<option value="' + x.i + '"' + (x.i === aSel ? " selected" : "") + '>' + esc(x.d.name) + '</option>'; }).join("") + '</optgroup>' : ''; }).join("") + '</select></label>';
       var d = S.divisions[aSel];
       if (d) {
         if (!Array.isArray(d.staff)) d.staff = [];
