@@ -748,18 +748,16 @@ html body img.country-flag{
 }
 </style>
 
-<style id="management-card-size-final">
-/* Ukuran kartu manajemen dibuat lebih terasa di desktop dan HP */
-.staff-list{gap:.7rem!important}
-.staff-row{min-height:82px!important;padding:1.45rem 1.55rem!important;gap:.7rem 1.35rem!important}
-.staff-name{font-size:1.55rem!important;line-height:1.25!important}
-.staff-role{font-size:.95rem!important}
-.staff-more{font-size:.78rem!important}
-@media(max-width:600px){
-  .staff-row{min-height:76px!important;padding:1.2rem 1rem!important;gap:.45rem .6rem!important}
-  .staff-name{font-size:1.25rem!important}
-  .staff-role{font-size:.82rem!important}
-  .staff-more{font-size:.68rem!important}
+
+<style id="management-popup-card-size">
+/* Perbesar kartu detail popup manajemen, bukan baris daftar manajemen */
+.staff-detail-modal .staff-detail-card{width:clamp(320px,32vw,440px)!important;max-width:calc(100vw - 2.5rem)!important}
+@media(min-width:600px) and (max-width:899px){.staff-detail-modal .staff-detail-card{width:clamp(300px,48vw,400px)!important}}
+@media(max-width:599px){
+.staff-detail-modal{padding:1rem!important}
+.staff-detail-modal .staff-detail-card{width:min(88vw,390px)!important;max-width:calc(100vw - 2rem)!important}
+.staff-detail-modal .staff-detail-copy{padding:.35rem 1rem 1.1rem!important}
+.staff-detail-modal .staff-detail-copy h5{font-size:1.25rem!important}
 }
 </style>
 </head>
