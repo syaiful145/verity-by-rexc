@@ -360,12 +360,22 @@ input:focus,select:focus{outline:none;border-color:var(--gold)}
 .ph{width:42px;height:42px;object-fit:cover;border:1px solid var(--line);vertical-align:middle;margin-right:.7rem}
 .dimg{display:block;width:auto;height:auto;max-width:min(100%,260px);max-height:170px;object-fit:contain;margin:.4rem auto 1.6rem;border:0}
 .tl{border-left:2px solid var(--gold);margin-left:.4rem;max-width:52rem}
-.tl article{position:relative;padding:0 0 2.2rem 1.6rem}
-.tl article::before{content:"";position:absolute;left:-8px;top:.3rem;width:14px;height:14px;background:var(--gold)}
-.tl .yr{font-family:var(--hud);color:var(--gold);letter-spacing:.14em;font-size:.85rem}
-.tl h3{font-family:var(--hud);text-transform:uppercase;margin:.2rem 0 .5rem;font-size:1.5rem}
-.tl p{color:var(--mute);margin:0 0 .8rem;white-space:pre-line}
-.tl img{max-width:100%;max-height:320px;border:1px solid var(--line)}
+.tl article{position:relative;padding:0 0 1.4rem 1.6rem}
+.tl article::before{content:"";position:absolute;left:-8px;top:.3rem;width:14px;height:14px;background:var(--gold);transition:transform .3s ease,box-shadow .3s ease}
+.tl .history-toggle{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.25rem .8rem;width:100%;padding:0;background:none;border:0;color:inherit;text-align:left;cursor:pointer}
+.tl .yr{grid-column:1/-1;font-family:var(--hud);color:var(--gold);letter-spacing:.14em;font-size:.85rem}
+.tl .history-title{font-family:var(--hud);text-transform:uppercase;margin:.15rem 0 .25rem;font-size:1.5rem;line-height:1.2}
+.tl .history-chevron{width:9px;height:9px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);transition:transform .35s ease;margin-right:.25rem}
+.tl .history-toggle[aria-expanded="true"] .history-chevron{transform:rotate(225deg)}
+.tl article:has(.history-toggle[aria-expanded="true"])::before{transform:scale(1.18);box-shadow:0 0 12px rgba(255,196,0,.45)}
+.tl .history-panel{max-height:5.1rem;overflow:hidden;opacity:.78;transition:max-height .55s cubic-bezier(.2,.75,.25,1),opacity .35s ease}
+.tl .history-panel-inner{padding-top:.45rem}
+.tl .history-panel p{color:var(--mute);margin:0 0 .8rem;white-space:pre-line;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.tl .history-panel img{max-width:100%;max-height:320px;border:1px solid var(--line);margin:.3rem 0 .8rem}
+.tl .history-item.expanded .history-panel{max-height:1200px;opacity:1}
+.tl .history-item.expanded .history-panel p{display:block;overflow:visible}
+.tl .history-toggle:focus-visible{outline:1px solid var(--gold);outline-offset:5px}
+@media(prefers-reduced-motion:reduce){.tl .history-panel,.tl .history-chevron,.tl article::before{transition:none}}
 .acard{border:1px solid var(--line);background:var(--ink-2);padding:1rem;margin:0 0 1rem;display:grid;gap:.6rem}
 .acard input:not([type=file]),.acard textarea,.acard select,.tx input,.tx textarea{width:100%;background:var(--ink);border:1px solid var(--line);color:var(--bone);padding:.5rem .6rem;font:inherit}
 .acard textarea,.tx textarea{min-height:70px;resize:vertical}
@@ -1112,10 +1122,17 @@ html body img.country-flag{
 
   /* ---------- Sejarah ---------- */
   function renderHistory() {
-    document.getElementById("tl").innerHTML = S.history.map(function (h) {
-      return '<article><span class="yr">' + esc(h.year) + '</span><h3>' + esc(h.title) + '</h3><p>' + esc(h.text) + '</p>' + (h.img ? '<img src="' + h.img + '" alt="">' : "") + '</article>';
+    document.getElementById("tl").innerHTML = S.history.map(function (h, i) {
+      return '<article class="history-item"><button class="history-toggle" type="button" aria-expanded="false" aria-controls="history-panel-' + i + '"><span class="yr">' + esc(h.year) + '</span><span class="history-title">' + esc(h.title) + '</span><span class="history-chevron" aria-hidden="true"></span></button><div class="history-panel" id="history-panel-' + i + '"><div class="history-panel-inner"><p>' + esc(h.text) + '</p>' + (h.img ? '<img src="' + esc(h.img) + '" alt="">' : "") + '</div></div></article>';
     }).join("") || '<p class="muted">Belum ada catatan sejarah.</p>';
   }
+  document.getElementById("tl").addEventListener("click", function (e) {
+    var toggle = e.target.closest(".history-toggle");
+    if (!toggle) return;
+    var item = toggle.closest(".history-item");
+    var expanded = item.classList.toggle("expanded");
+    toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+  });
 
   /* ---------- Teks yang bisa diedit admin ---------- */
   var leafs = [];
