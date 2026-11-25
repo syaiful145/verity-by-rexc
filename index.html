@@ -389,9 +389,12 @@ input:focus,select:focus{outline:none;border-color:var(--gold)}
 .quick::before,.news::before,.pillars::before,.info::before,.dacc::before{top:-1px;left:-1px;border-top:2px solid var(--gold);border-left:2px solid var(--gold)}
 .quick::after,.news::after,.pillars::after,.info::after,.dacc::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold)}
 .reg{margin-top:1.8rem}
-.rgh{display:flex;justify-content:space-between;align-items:center;gap:1rem;border-left:3px solid var(--gold);padding-left:.9rem}
-.rgh h4{margin:0;min-width:0;font-family:var(--hud);font-size:1.5rem;text-transform:uppercase;letter-spacing:.06em}
+.rgh{display:flex;justify-content:space-between;align-items:center;gap:1rem;border-left:3px solid var(--gold);padding:.25rem 0 .25rem .9rem;min-width:0}
+.rgh h4{display:flex;align-items:center;gap:.65rem;margin:0;min-width:0;font-family:var(--hud);font-size:1.5rem;text-transform:uppercase;letter-spacing:.06em}
+.rgh .country-flag{display:inline-flex;align-items:center;justify-content:center;width:1.65rem;min-width:1.65rem;height:1.2rem;font-family:system-ui,sans-serif;font-size:1.15rem;line-height:1;letter-spacing:0;text-transform:none}
+.rgh .region-vt{flex:none;color:var(--gold);font-family:var(--hud);font-size:.78rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
 .rgh span,.tmh span{flex:none;color:var(--mute);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+@media(max-width:600px){.rgh h4{font-size:1.15rem;gap:.5rem}.rgh .country-flag{width:1.55rem;min-width:1.55rem;font-size:1.05rem}.rgh .region-vt{font-size:.7rem}}
 .tmh{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin:1.2rem 0 0;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
 .tmh h5{margin:0;min-width:0;font-family:var(--hud);color:var(--gold);font-size:1.05rem;text-transform:uppercase;letter-spacing:.12em}
 .brand{gap:.7rem;min-width:0}
@@ -649,9 +652,25 @@ h1,h2,h3,h4,h5,p,li,dd,dt,td,th,strong,span,a,button{overflow-wrap:break-word}
     return '<article class="pc' + (p[4] === "lead" ? " lead" : "") + '"><div class="pimg">' + (p[5] ? '<img src="' + p[5] + '" alt="' + esc(p[1]) + '">' : SIL) + tag + '</div>' +
       '<div class="pinfo"><h5>' + esc(p[1]) + '</h5><span class="pn">' + esc(p[2]) + '</span><span class="pr">' + esc(p[3]) + '</span></div></article>';
   }
+  function countryFlag(name) {
+    var codes = {
+      "indonesia":"ID","malaysia":"MY","singapore":"SG","philippines":"PH","filipina":"PH",
+      "thailand":"TH","vietnam":"VN","viet nam":"VN","myanmar":"MM","burma":"MM",
+      "cambodia":"KH","kamboja":"KH","laos":"LA","brunei":"BN","brunei darussalam":"BN",
+      "timor-leste":"TL","timor leste":"TL","japan":"JP","jepang":"JP","south korea":"KR",
+      "korea selatan":"KR","korea":"KR","china":"CN","tiongkok":"CN","india":"IN",
+      "pakistan":"PK","bangladesh":"BD","nepal":"NP","sri lanka":"LK","australia":"AU",
+      "new zealand":"NZ","united states":"US","usa":"US","amerika serikat":"US",
+      "canada":"CA","united kingdom":"GB","uk":"GB","inggris":"GB","brazil":"BR",
+      "brasil":"BR","argentina":"AR","turkey":"TR","turki":"TR","russia":"RU","rusia":"RU"
+    };
+    var code = codes[String(name || "").trim().toLowerCase()];
+    if (!code) return "🌐";
+    return String.fromCodePoint(127462 + code.charCodeAt(0) - 65, 127462 + code.charCodeAt(1) - 65);
+  }
   function regionsHtml(d) {
     return d.regions.map(function (rg) {
-      return '<section class="reg"><div class="rgh"><h4>' + esc(rg.name) + '</h4></div>' +
+      return '<section class="reg"><div class="rgh"><h4><span class="country-flag" aria-hidden="true">' + countryFlag(rg.name) + '</span><span>' + esc(rg.name) + '</span></h4><span class="region-vt">VT</span></div>' +
         rg.teams.map(function (t) {
           return '<div class="tmh"><h5>' + esc(t.name) + '</h5><span>' + t.roster.length + ' pemain</span></div><div class="pgrid">' + t.roster.map(playerCard).join("") + '</div>';
         }).join("") + '</section>';
